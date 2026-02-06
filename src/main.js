@@ -3,9 +3,13 @@ import { GameConfig } from './core/GameConfig.js';
 import { eventBus, Events } from './core/EventBus.js';
 import { gameState } from './core/GameState.js';
 import { initAudioBridge, toggleMute } from './audio/AudioBridge.js';
+import { initPlayFun } from './playfun.js';
 
 // Initialize audio bridge (wires EventBus to audio)
 initAudioBridge();
+
+// Initialize Play.fun SDK (non-blocking)
+initPlayFun().catch(err => console.warn('[PlayFun] Init failed:', err));
 
 // Initialize audio on first click (browser autoplay policy)
 // Same pattern as whack-an-ape - simple and it works
