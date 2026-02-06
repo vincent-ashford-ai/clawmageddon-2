@@ -2,9 +2,12 @@
 // CLAWMAGEDDON 2 - AUDIO MANAGER
 // Singleton that handles Strudel BGM init, playback, and mute toggle.
 // SFX are handled separately via Web Audio API in sfx.js.
+// 
+// IMPORTANT: Uses dynamic imports to avoid loading Strudel before user gesture.
+// This prevents "AudioContext was not allowed to start" errors on mobile.
 // =============================================================================
 
-import { initStrudel, hush } from '@strudel/web';
+// Strudel functions are loaded dynamically
 
 class AudioManager {
   constructor() {
@@ -12,6 +15,18 @@ class AudioManager {
     this.currentMusic = null;
     this.muted = false;
     this.pendingMusic = null; // Queue for music requested before init
+    this.strudelModule = null; // Cached Strudel module
+  }
+  
+  /**
+   * Get or load Strudel module.
+   * @returns {Promise<object>} Strudel module
+   */
+  async getStrudel() {
+    if (!this.strudelModule) {
+      this.strudelModule = await import('@strudel/web');
+    }
+    return this.strudelModule;
   }
 
   /**
@@ -36,9 +51,9 @@ class AudioManager {
 
   /**
    * Play a BGM pattern. Stops current music first.
-   * @param {Function} patternFn - Function that returns a Strudel pattern with .play()
+   * @param {Function} patternFn - Async function that returns a Strudel pattern with .play()
    */
-  playMusic(patternFn) {
+  async playMusic(patternFn) {
     // If not initialized yet, queue it for later
     if (!this.initialized) {
       console.log('[Audio] Queuing music (not initialized yet)');
@@ -46,11 +61,12 @@ class AudioManager {
       return;
     }
     if (this.muted) return;
-    this.stopMusic();
+    await this.stopMusic();
     // hush() needs a scheduler tick to process before new pattern starts
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
-        this.currentMusic = patternFn();
+        // patternFn is now async (uses dynamic import)
+        this.currentMusic = await patternFn();
       } catch (e) {
         console.warn('[Audio] BGM error:', e);
       }
@@ -60,9 +76,10 @@ class AudioManager {
   /**
    * Stop all currently playing music.
    */
-  stopMusic() {
+  async stopMusic() {
     if (!this.initialized) return;
     try {
+      const { hush } = await this.getStrudel();
       hush();
     } catch (e) {
       // noop - might not have anything playing
@@ -77,7 +94,7 @@ class AudioManager {
   toggleMute() {
     this.muted = !this.muted;
     if (this.muted) {
-      this.stopMusic();
+      this.stopMusic(); // async but we don't need to wait
     }
     console.log('[Audio] Muted:', this.muted);
     return this.muted;
@@ -90,7 +107,7 @@ class AudioManager {
   setMuted(muted) {
     this.muted = muted;
     if (this.muted) {
-      this.stopMusic();
+      this.stopMusic(); // async but we don't need to wait
     }
   }
 

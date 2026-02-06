@@ -2,9 +2,12 @@
 // CLAWMAGEDDON 2 - AUDIO UNLOCK
 // Handles browser autoplay policy by unlocking Web Audio on first user gesture.
 // Works on iOS Safari, Chrome, Firefox, and other mobile browsers.
+// 
+// IMPORTANT: Uses dynamic imports to avoid loading Strudel before user gesture.
+// This prevents "AudioContext was not allowed to start" errors on mobile.
 // =============================================================================
 
-import { initStrudel, setAudioContext } from '@strudel/web';
+// Strudel functions are loaded dynamically in unlockAudio()
 
 let unlocked = false;
 let unlockPromise = null;
@@ -131,12 +134,12 @@ export async function unlockAudio(existingCtx = null) {
     const isRunning = await waitForRunning(ctx, 500);
     console.log('[AudioUnlock] Context running:', isRunning, 'state:', ctx.state);
 
-    // STEP 6: NOW set the context for Strudel (context is fully unlocked)
-    setAudioContext(ctx);
-    console.log('[AudioUnlock] Set Strudel AudioContext');
-
-    // STEP 7: Initialize Strudel with the unlocked context
+    // STEP 6: Dynamically import and initialize Strudel (context is fully unlocked)
+    // Using dynamic import ensures Strudel doesn't load until user gesture
     try {
+      const { initStrudel, setAudioContext } = await import('@strudel/web');
+      setAudioContext(ctx);
+      console.log('[AudioUnlock] Set Strudel AudioContext');
       initStrudel();
       console.log('[AudioUnlock] Strudel initialized');
     } catch (e) {

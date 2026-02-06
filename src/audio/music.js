@@ -2,31 +2,32 @@
 // CLAWMAGEDDON 2 - MUSIC (BGM)
 // Strudel patterns for background music.
 // Post-apocalyptic, intense, 8-bit chiptune style.
+// 
+// IMPORTANT: Uses dynamic imports to avoid loading Strudel before user gesture.
+// This prevents "AudioContext was not allowed to start" errors on mobile.
 // =============================================================================
 
-import { note, stack } from '@strudel/web';
+// Cache for dynamically loaded Strudel functions
+let strudelModule = null;
 
-// =============================================================================
-// SYNTHESIZED DRUMS (no samples needed - works immediately)
-// =============================================================================
-
-// Kick drum - sine wave with pitch drop
-const kick = () => note('c1').s('sine').gain(0.5).decay(0.15).sustain(0);
-
-// Snare - noise burst with tone
-const snare = () => note('c3').s('square').gain(0.25).decay(0.08).sustain(0).lpf(2000);
-
-// Hi-hat - high noise burst  
-const hihat = () => note('c6').s('square').gain(0.12).decay(0.03).sustain(0).hpf(8000);
-
-// Open hi-hat - longer decay
-const openhat = () => note('c6').s('square').gain(0.15).decay(0.12).sustain(0).hpf(6000);
+/**
+ * Lazy-load Strudel functions.
+ * Only loads on first call (after user gesture).
+ */
+async function getStrudel() {
+  if (!strudelModule) {
+    strudelModule = await import('@strudel/web');
+  }
+  return strudelModule;
+}
 
 /**
  * Menu Theme - Tense, atmospheric, building anticipation
  * Dark and brooding, hints at the chaos to come.
  */
-export function menuTheme() {
+export async function menuTheme() {
+  const { note, stack } = await getStrudel();
+  
   return stack(
     // Ominous bass drone - low rumble of the wasteland
     note('e1 ~ ~ ~ e1 ~ ~ ~ d1 ~ ~ ~ a0 ~ ~ ~')
@@ -73,18 +74,13 @@ export function menuTheme() {
 /**
  * Gameplay Theme - CHIPTUNE METAL ASSAULT
  * 8-bar loop (~12 seconds at 160 BPM)
- * Structure: 4-bar main riff → 4-bar breakdown/variation → loop
  * Key: E minor (the metal standard)
- * 
- * Note: cpm(5) = 5 cycles/min = 12 sec/cycle, giving us 160 BPM feel
- * (160 BPM = 40 bars/min, 8 bars/pattern = 5 patterns/min)
  */
-export function gameplayTheme() {
+export async function gameplayTheme() {
+  const { note, stack } = await getStrudel();
+  
   return stack(
-    // =========================================================================
     // CHUGGING RHYTHM GUITAR - Palm-muted power chord simulation
-    // The backbone of metal: relentless 8th note chugging with accents
-    // =========================================================================
     note(`
       [e2 e2 e2 e2 e2 e2 e2 e2] [e2 e2 e2 e2 g2 g2 a2 a2]
       [e2 e2 e2 e2 e2 e2 e2 e2] [b1 b1 b1 b1 c2 c2 d2 d2]
@@ -98,10 +94,7 @@ export function gameplayTheme() {
       .sustain(0.3)
       .release(0.05),
 
-    // =========================================================================
     // POWER CHORD STABS - Accented hits for punch
-    // Doubled 5ths for that thick metal sound
-    // =========================================================================
     note(`
       [e2,b2 ~ ~ ~ e2,b2 ~ ~ ~] [~ ~ ~ ~ g2,d3 ~ a2,e3 ~]
       [e2,b2 ~ ~ ~ e2,b2 ~ ~ ~] [b1,f#2 ~ ~ ~ c2,g2 ~ d2,a2 ~]
@@ -115,10 +108,7 @@ export function gameplayTheme() {
       .sustain(0.4)
       .release(0.1),
 
-    // =========================================================================
     // LEAD MELODY - Aggressive square wave shred
-    // Bars 1-4: Main hook, Bars 5-8: Variation/response
-    // =========================================================================
     note(`
       [e5 ~ g5 e5 ~ b4 ~ g4] [a4 ~ b4 ~ d5 ~ e5 ~]
       [e5 ~ d5 ~ b4 ~ g4 ~] [a4 b4 d5 ~ ~ ~ ~ ~]
@@ -132,9 +122,7 @@ export function gameplayTheme() {
       .sustain(0.5)
       .release(0.15),
 
-    // =========================================================================
     // HARMONY LEAD - Thirds/fifths above for thickness
-    // =========================================================================
     note(`
       [g5 ~ b5 g5 ~ d5 ~ b4] [c5 ~ d5 ~ f#5 ~ g5 ~]
       [g5 ~ f#5 ~ d5 ~ b4 ~] [c5 d5 f#5 ~ ~ ~ ~ ~]
@@ -148,10 +136,7 @@ export function gameplayTheme() {
       .sustain(0.4)
       .release(0.15),
 
-    // =========================================================================
     // BASS - Octave-doubled root notes, tight and punchy
-    // Follows the chord progression with some rhythmic variation
-    // =========================================================================
     note(`
       [e1 ~ ~ e1 ~ ~ e1 ~] [e1 ~ ~ ~ g1 ~ a1 ~]
       [e1 ~ ~ e1 ~ ~ e1 ~] [b0 ~ ~ ~ c1 ~ d1 ~]
@@ -164,11 +149,9 @@ export function gameplayTheme() {
       .decay(0.12)
       .sustain(0.5),
 
-    // =========================================================================
-    // DRUMS - Synthesized metal kit (no samples needed)
-    // =========================================================================
+    // DRUMS - Synthesized metal kit
     
-    // Kick drum - driving double-kick pattern (sine wave with pitch drop)
+    // Kick drum
     note(`
       [c1 c1 ~ c1 c1 ~ c1 c1] [c1 c1 ~ c1 c1 c1 c1 c1]
       [c1 c1 ~ c1 c1 ~ c1 c1] [c1 c1 c1 c1 c1 c1 c1 c1]
@@ -180,7 +163,7 @@ export function gameplayTheme() {
       .decay(0.12)
       .sustain(0),
 
-    // Snare - backbeat with fills (noise-like square)
+    // Snare
     note(`
       [~ ~ c4 ~ ~ ~ c4 ~] [~ ~ c4 ~ ~ ~ c4 ~]
       [~ ~ c4 ~ ~ ~ c4 ~] [~ ~ c4 ~ c4 c4 c4 c4]
@@ -194,7 +177,7 @@ export function gameplayTheme() {
       .lpf(2500)
       .hpf(200),
 
-    // Hi-hats - 16th note drive (high square bursts)
+    // Hi-hats
     note(`
       [g7 g7 g7 g7 g7 g7 a7 g7]*4
       [g7 g7 g7 g7 g7 g7 a7 g7]*3 [g7 g7 g7 g7 a7 a7 a7 a7]
@@ -205,7 +188,7 @@ export function gameplayTheme() {
       .sustain(0)
       .hpf(8000),
 
-    // Crash accents on section changes
+    // Crash accents
     note(`
       [a7 ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ ~ ~ ~ ~]
       [~ ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ ~ ~ ~ ~]
@@ -218,9 +201,7 @@ export function gameplayTheme() {
       .sustain(0)
       .hpf(5000),
 
-    // =========================================================================
     // TEXTURE - Fast arpeggio for chiptune shimmer
-    // =========================================================================
     note('<e4 g4 b4 e5 b4 g4>*8')
       .s('triangle')
       .gain(0.05)
@@ -233,19 +214,13 @@ export function gameplayTheme() {
 
 /**
  * Heavy Metal Powerup Theme - MAXIMUM OVERDRIVE
- * 8-bar loop (~12 seconds) - plays during Heavy Metal powerup
- * Even more intense than gameplay theme - power fantasy moment!
- * Key: E minor, faster tempo feel, more aggressive
- * 
- * Note: cpm(5) = 5 cycles/min = 12 sec/cycle
- * Internal patterns are denser for that frantic metal feel
+ * 8-bar loop - plays during Heavy Metal powerup
  */
-export function heavyMetalTheme() {
+export async function heavyMetalTheme() {
+  const { note, stack } = await getStrudel();
+  
   return stack(
-    // =========================================================================
     // BRUTAL RHYTHM - Galloping palm-muted mayhem
-    // Classic metal gallop: 1-&-a pattern, relentless
-    // =========================================================================
     note(`
       [e2 e2 e2 e2 e2 e2 e2 e2 e2 e2 e2 e2 e2 e2 e2 e2]
       [g2 g2 g2 g2 a2 a2 a2 a2 b2 b2 b2 b2 a2 a2 g2 g2]
@@ -263,10 +238,7 @@ export function heavyMetalTheme() {
       .sustain(0.25)
       .release(0.03),
 
-    // =========================================================================
-    // POWER CHORD ASSAULT - Crushing doubled 5ths
-    // Big stabs on the accents
-    // =========================================================================
+    // POWER CHORD ASSAULT
     note(`
       [e2,b2,e3 ~ ~ ~ e2,b2,e3 ~ ~ ~ e2,b2,e3 ~ ~ ~ e2,b2,e3 ~ ~ ~]
       [g2,d3,g3 ~ ~ ~ a2,e3,a3 ~ ~ ~ b2,f#3,b3 ~ ~ ~ a2,e3,a3 ~ ~ ~]
@@ -284,10 +256,7 @@ export function heavyMetalTheme() {
       .sustain(0.5)
       .release(0.08),
 
-    // =========================================================================
-    // SHRED LEAD - Blazing fast arpeggios and runs
-    // Maximum intensity solo vibes
-    // =========================================================================
+    // SHRED LEAD
     note(`
       [e5 g5 b5 e6 b5 g5 e5 b4] [g5 a5 b5 d6 e6 d6 b5 a5]
       [g5 b5 d6 g6 d6 b5 g5 d5] [e5 f#5 g5 a5 b5 a5 g5 f#5]
@@ -305,9 +274,7 @@ export function heavyMetalTheme() {
       .sustain(0.6)
       .release(0.1),
 
-    // =========================================================================
-    // HARMONY SHRED - Thirds above for that twin guitar attack
-    // =========================================================================
+    // HARMONY SHRED
     note(`
       [g5 b5 d6 g6 d6 b5 g5 d5] [b5 c6 d6 f#6 g6 f#6 d6 c6]
       [b5 d6 f#6 b6 f#6 d6 b5 f#5] [g5 a5 b5 c6 d6 c6 b5 a5]
@@ -325,9 +292,7 @@ export function heavyMetalTheme() {
       .sustain(0.5)
       .release(0.1),
 
-    // =========================================================================
-    // THUNDEROUS BASS - Octave runs, relentless
-    // =========================================================================
+    // THUNDEROUS BASS
     note(`
       [e1 e1 e1 e1 e1 e1 e1 e1] [g1 g1 a1 a1 b1 b1 a1 a1]
       [e1 e1 e1 e1 f#1 f#1 g1 g1] [b1 a1 g1 f#1 e1 e1 e1 e1]
@@ -340,20 +305,16 @@ export function heavyMetalTheme() {
       .decay(0.1)
       .sustain(0.6),
 
-    // =========================================================================
-    // MACHINE GUN DRUMS - Synthesized blast beats
-    // =========================================================================
+    // MACHINE GUN DRUMS
     
-    // Kick - constant double-kick assault (sine wave)
-    note(`
-      [c1 c1 c1 c1 c1 c1 c1 c1]*8
-    `)
+    // Kick
+    note(`[c1 c1 c1 c1 c1 c1 c1 c1]*8`)
       .s('sine')
       .gain(0.50)
       .decay(0.10)
       .sustain(0),
 
-    // Snare - blast beat on every beat (square noise)
+    // Snare
     note(`
       [~ c4 ~ c4 ~ c4 ~ c4]*4
       [c4 c4 c4 c4 c4 c4 c4 c4]*2
@@ -367,7 +328,7 @@ export function heavyMetalTheme() {
       .lpf(3000)
       .hpf(200),
 
-    // Hi-hats - 32nd note fury (high square)
+    // Hi-hats
     note(`
       [g7 g7 g7 g7 g7 g7 a7 g7 g7 g7 g7 g7 g7 g7 a7 g7]*4
       [a7 a7 a7 a7 a7 a7 a7 a7 g7 g7 g7 g7 a7 a7 a7 a7]*2
@@ -379,7 +340,7 @@ export function heavyMetalTheme() {
       .sustain(0)
       .hpf(9000),
 
-    // China/crash chaos (high square burst)
+    // China/crash chaos
     note(`
       [a7 ~ ~ ~ a7 ~ ~ ~ a7 ~ ~ ~ a7 ~ ~ ~]*2
       [a7 ~ ~ ~ ~ ~ ~ ~ a7 ~ ~ ~ ~ ~ ~ ~]*2
@@ -394,9 +355,7 @@ export function heavyMetalTheme() {
       .sustain(0)
       .hpf(4000),
 
-    // =========================================================================
-    // CHAOS ARPS - Frantic chiptune shimmer
-    // =========================================================================
+    // CHAOS ARPS
     note('<e5 b5 g5 e6 b5 g5 e5 g5 b5 e6 g6 e6 b5 g5 e5 b4>')
       .s('triangle')
       .gain(0.07)
@@ -404,9 +363,7 @@ export function heavyMetalTheme() {
       .decay(0.03)
       .sustain(0),
 
-    // =========================================================================
-    // LOW GROWL - Sub bass for extra weight
-    // =========================================================================
+    // LOW GROWL
     note('e1 ~ ~ ~ e1 ~ ~ ~ e1 ~ ~ ~ e1 ~ ~ ~')
       .s('sine')
       .gain(0.20)
@@ -417,11 +374,12 @@ export function heavyMetalTheme() {
 
 /**
  * Game Over Theme - Somber, dramatic sting
- * The Lobster has fallen. A moment of silence for our hero.
  */
-export function gameOverTheme() {
+export async function gameOverTheme() {
+  const { note, stack } = await getStrudel();
+  
   return stack(
-    // Descending doom melody - classic game over descent
+    // Descending doom melody
     note('b4 ~ a4 ~ g4 ~ e4 ~ d4 ~ c4 ~ ~ ~ ~ ~')
       .s('square')
       .gain(0.20)
@@ -432,7 +390,7 @@ export function gameOverTheme() {
       .room(0.5)
       .slow(2),
     
-    // Dark pad - minor chord despair
+    // Dark pad
     note('a2,c3,e3')
       .s('triangle')
       .attack(0.6)
@@ -452,7 +410,7 @@ export function gameOverTheme() {
       .lpf(250)
       .slow(4),
     
-    // Eerie high tone - lingering sorrow
+    // Eerie high tone
     note('~ ~ ~ ~ e5 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~')
       .s('triangle')
       .gain(0.06)
