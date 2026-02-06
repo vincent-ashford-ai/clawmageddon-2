@@ -4,21 +4,14 @@
 // These do NOT use Strudel - they fire once and stop immediately.
 // =============================================================================
 
-import { isAudioUnlocked } from './audioUnlock.js';
-
 let audioCtx = null;
 let sfxMuted = false;
 
 /**
  * Get or create the AudioContext.
- * Returns null if audio hasn't been unlocked yet (prevents suspended context issues on mobile).
+ * Creates lazily and resumes if suspended.
  */
 function getCtx() {
-  // Don't create context until audio is unlocked (mobile browsers)
-  if (!isAudioUnlocked()) {
-    return null;
-  }
-  
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
@@ -49,7 +42,6 @@ export function isSfxMuted() {
 function playTone(freq, type, duration, gain = 0.3, filterFreq = 4000) {
   if (sfxMuted) return;
   const ctx = getCtx();
-  if (!ctx) return; // Audio not unlocked yet
   const now = ctx.currentTime;
 
   const osc = ctx.createOscillator();
@@ -75,7 +67,6 @@ function playTone(freq, type, duration, gain = 0.3, filterFreq = 4000) {
 function playNotes(notes, type, noteDuration, gap, gain = 0.3, filterFreq = 4000) {
   if (sfxMuted) return;
   const ctx = getCtx();
-  if (!ctx) return; // Audio not unlocked yet
   const now = ctx.currentTime;
 
   notes.forEach((freq, i) => {
@@ -104,7 +95,6 @@ function playNotes(notes, type, noteDuration, gap, gain = 0.3, filterFreq = 4000
 function playSweep(startFreq, endFreq, type, duration, gain = 0.3, filterFreq = 4000) {
   if (sfxMuted) return;
   const ctx = getCtx();
-  if (!ctx) return; // Audio not unlocked yet
   const now = ctx.currentTime;
 
   const osc = ctx.createOscillator();
@@ -131,7 +121,6 @@ function playSweep(startFreq, endFreq, type, duration, gain = 0.3, filterFreq = 
 function playNoise(duration, gain = 0.2, lpfFreq = 4000, hpfFreq = 0) {
   if (sfxMuted) return;
   const ctx = getCtx();
-  if (!ctx) return; // Audio not unlocked yet
   const now = ctx.currentTime;
   const bufferSize = Math.floor(ctx.sampleRate * duration);
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -255,7 +244,6 @@ export function nukeExplosionSfx() {
   playNoise(0.3, 0.2, 8000, 2000);
   // Ascending then descending tone (mushroom cloud rising)
   const ctx = getCtx();
-  if (!ctx) return; // Audio not unlocked yet
   const now = ctx.currentTime;
   
   const osc = ctx.createOscillator();

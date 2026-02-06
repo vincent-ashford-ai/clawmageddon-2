@@ -9,7 +9,6 @@ import { GAME, UI, COLORS, TIMING } from '../core/Constants.js';
 import { eventBus, Events } from '../core/EventBus.js';
 import { renderPixelArt } from '../core/PixelRenderer.js';
 import { generateTitleScreen, SCREEN_PALETTE } from '../sprites/screens.js';
-import { isAudioUnlocked } from '../audio/audioUnlock.js';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -112,20 +111,8 @@ export class MenuScene extends Phaser.Scene {
     this.input.once('pointerdown', () => this.startGame());
     this.input.keyboard.once('keydown-SPACE', () => this.startGame());
     
-    // Start menu music when audio is ready
-    // On desktop, audio may already be unlocked; on mobile, we wait for first tap
-    if (isAudioUnlocked()) {
-      eventBus.emit(Events.MUSIC_MENU);
-    } else {
-      // Wait for audio to be unlocked, then start music
-      // Use 'once' to avoid duplicate playback
-      eventBus.once(Events.AUDIO_READY, () => {
-        // Only play if we're still on the menu scene
-        if (this.scene.isActive('MenuScene')) {
-          eventBus.emit(Events.MUSIC_MENU);
-        }
-      });
-    }
+    // Start menu music (will be queued if audio not initialized yet)
+    eventBus.emit(Events.MUSIC_MENU);
     
     // Fade in from black
     this.cameras.main.fadeIn(TIMING.SCENE_FADE_IN, 0, 0, 0);

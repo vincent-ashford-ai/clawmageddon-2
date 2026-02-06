@@ -3,31 +3,15 @@
 // Strudel patterns for background music.
 // Post-apocalyptic, intense, 8-bit chiptune style.
 // 
-// IMPORTANT: Uses dynamic imports to avoid loading Strudel before user gesture.
-// This prevents "AudioContext was not allowed to start" errors on mobile.
+// Uses STATIC imports like whack-an-ape. Functions are synchronous.
 // =============================================================================
-
-// Cache for dynamically loaded Strudel functions
-let strudelModule = null;
-
-/**
- * Lazy-load Strudel functions.
- * Only loads on first call (after user gesture).
- */
-async function getStrudel() {
-  if (!strudelModule) {
-    strudelModule = await import('@strudel/web');
-  }
-  return strudelModule;
-}
+import { note, stack, s } from '@strudel/web';
 
 /**
  * Menu Theme - Tense, atmospheric, building anticipation
  * Dark and brooding, hints at the chaos to come.
  */
-export async function menuTheme() {
-  const { note, stack } = await getStrudel();
-  
+export function menuTheme() {
   return stack(
     // Ominous bass drone - low rumble of the wasteland
     note('e1 ~ ~ ~ e1 ~ ~ ~ d1 ~ ~ ~ a0 ~ ~ ~')
@@ -76,9 +60,7 @@ export async function menuTheme() {
  * 8-bar loop (~12 seconds at 160 BPM)
  * Key: E minor (the metal standard)
  */
-export async function gameplayTheme() {
-  const { note, stack } = await getStrudel();
-  
+export function gameplayTheme() {
   return stack(
     // CHUGGING RHYTHM GUITAR - Palm-muted power chord simulation
     note(`
@@ -216,9 +198,7 @@ export async function gameplayTheme() {
  * Heavy Metal Powerup Theme - MAXIMUM OVERDRIVE
  * 8-bar loop - plays during Heavy Metal powerup
  */
-export async function heavyMetalTheme() {
-  const { note, stack } = await getStrudel();
-  
+export function heavyMetalTheme() {
   return stack(
     // BRUTAL RHYTHM - Galloping palm-muted mayhem
     note(`
@@ -375,9 +355,7 @@ export async function heavyMetalTheme() {
 /**
  * Game Over Theme - Somber, dramatic sting
  */
-export async function gameOverTheme() {
-  const { note, stack } = await getStrudel();
-  
+export function gameOverTheme() {
   return stack(
     // Descending doom melody
     note('b4 ~ a4 ~ g4 ~ e4 ~ d4 ~ c4 ~ ~ ~ ~ ~')

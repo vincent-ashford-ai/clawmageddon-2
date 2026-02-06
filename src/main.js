@@ -3,21 +3,19 @@ import { GameConfig } from './core/GameConfig.js';
 import { eventBus, Events } from './core/EventBus.js';
 import { gameState } from './core/GameState.js';
 import { initAudioBridge, toggleMute } from './audio/AudioBridge.js';
-import { setupAudioUnlock, whenAudioUnlocked } from './audio/audioUnlock.js';
 
-// Set up audio unlock listeners FIRST (before Phaser, before anything else)
-// This ensures we catch the very first user interaction
-setupAudioUnlock();
-
-// Initialize audio bridge (wires EventBus to audio system)
+// Initialize audio bridge (wires EventBus to audio)
 initAudioBridge();
 
-// Initialize audio systems after unlock (required by browser autoplay policy)
-whenAudioUnlocked().then(() => {
+// Initialize audio on first click (browser autoplay policy)
+// Same pattern as whack-an-ape - simple and it works
+const initAudioOnClick = () => {
   eventBus.emit(Events.AUDIO_INIT);
-  // Emit ready event so scenes can start playing music
-  eventBus.emit(Events.AUDIO_READY);
-});
+  document.removeEventListener('click', initAudioOnClick);
+  document.removeEventListener('touchstart', initAudioOnClick);
+};
+document.addEventListener('click', initAudioOnClick);
+document.addEventListener('touchstart', initAudioOnClick);
 
 const game = new Phaser.Game(GameConfig);
 

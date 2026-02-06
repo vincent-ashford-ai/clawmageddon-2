@@ -3,57 +3,45 @@
 // Singleton that handles Strudel BGM init, playback, and mute toggle.
 // SFX are handled separately via Web Audio API in sfx.js.
 // 
-// IMPORTANT: Uses dynamic imports to avoid loading Strudel before user gesture.
-// This prevents "AudioContext was not allowed to start" errors on mobile.
+// Uses STATIC imports like whack-an-ape. initStrudel() is called on first click.
 // =============================================================================
-
-// Strudel functions are loaded dynamically
+import { initStrudel, hush } from '@strudel/web';
 
 class AudioManager {
   constructor() {
     this.initialized = false;
     this.currentMusic = null;
     this.muted = false;
-    this.pendingMusic = null; // Queue for music requested before init
-    this.strudelModule = null; // Cached Strudel module
-  }
-  
-  /**
-   * Get or load Strudel module.
-   * @returns {Promise<object>} Strudel module
-   */
-  async getStrudel() {
-    if (!this.strudelModule) {
-      this.strudelModule = await import('@strudel/web');
-    }
-    return this.strudelModule;
+    this.pendingMusic = null;
   }
 
   /**
    * Initialize Strudel audio engine.
-   * Note: Strudel is now initialized directly in audioUnlock.js during the user gesture.
-   * This function just marks the manager as ready.
+   * Must be called from a user gesture handler (click/touchstart).
    */
   init() {
     if (this.initialized) return;
-    // Strudel is already initialized by audioUnlock.js in the user gesture context
-    // We just need to mark ourselves as ready
-    this.initialized = true;
-    console.log('[Audio] AudioManager ready');
-    
-    // Play any pending music that was requested before init
-    if (this.pendingMusic && !this.muted) {
-      console.log('[Audio] Playing pending music');
-      this.playMusic(this.pendingMusic);
-      this.pendingMusic = null;
+    try {
+      initStrudel();
+      this.initialized = true;
+      console.log('[Audio] Strudel initialized');
+      
+      // Play any pending music that was requested before init
+      if (this.pendingMusic && !this.muted) {
+        console.log('[Audio] Playing pending music');
+        this.playMusic(this.pendingMusic);
+        this.pendingMusic = null;
+      }
+    } catch (e) {
+      console.warn('[Audio] Strudel init failed:', e);
     }
   }
 
   /**
    * Play a BGM pattern. Stops current music first.
-   * @param {Function} patternFn - Async function that returns a Strudel pattern with .play()
+   * @param {Function} patternFn - Function that returns a Strudel pattern with .play()
    */
-  async playMusic(patternFn) {
+  playMusic(patternFn) {
     // If not initialized yet, queue it for later
     if (!this.initialized) {
       console.log('[Audio] Queuing music (not initialized yet)');
@@ -61,12 +49,11 @@ class AudioManager {
       return;
     }
     if (this.muted) return;
-    await this.stopMusic();
+    this.stopMusic();
     // hush() needs a scheduler tick to process before new pattern starts
-    setTimeout(async () => {
+    setTimeout(() => {
       try {
-        // patternFn is now async (uses dynamic import)
-        this.currentMusic = await patternFn();
+        this.currentMusic = patternFn();
       } catch (e) {
         console.warn('[Audio] BGM error:', e);
       }
@@ -76,10 +63,9 @@ class AudioManager {
   /**
    * Stop all currently playing music.
    */
-  async stopMusic() {
+  stopMusic() {
     if (!this.initialized) return;
     try {
-      const { hush } = await this.getStrudel();
       hush();
     } catch (e) {
       // noop - might not have anything playing
@@ -94,7 +80,7 @@ class AudioManager {
   toggleMute() {
     this.muted = !this.muted;
     if (this.muted) {
-      this.stopMusic(); // async but we don't need to wait
+      this.stopMusic();
     }
     console.log('[Audio] Muted:', this.muted);
     return this.muted;
@@ -107,7 +93,7 @@ class AudioManager {
   setMuted(muted) {
     this.muted = muted;
     if (this.muted) {
-      this.stopMusic(); // async but we don't need to wait
+      this.stopMusic();
     }
   }
 
