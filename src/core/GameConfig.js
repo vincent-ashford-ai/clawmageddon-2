@@ -41,4 +41,12 @@ export const GameConfig = {
   input: {
     activePointers: 2,
   },
+  
+  // CRITICAL: Disable Phaser's built-in audio to prevent premature AudioContext creation
+  // The game uses Strudel (BGM) and custom Web Audio API (SFX) instead
+  // Without this, Phaser creates an AudioContext during game init, BEFORE user gesture,
+  // which causes mobile browsers to show warnings/errors about autoplay policy
+  audio: {
+    noAudio: true,
+  },
 };
