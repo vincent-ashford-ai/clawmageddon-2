@@ -70,18 +70,4 @@ function wireEvents() {
     sdk.savePoints();
     lastScore = 0;
   });
-
-  // Auto-save every 30 seconds during gameplay
-  setInterval(() => {
-    if (sdk && initialized) {
-      sdk.savePoints();
-    }
-  }, 30000);
-
-  // Save on page unload
-  window.addEventListener('beforeunload', () => {
-    if (sdk && initialized) {
-      sdk.savePoints();
-    }
-  });
 }
