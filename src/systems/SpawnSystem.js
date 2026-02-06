@@ -10,7 +10,7 @@ import { gameState } from '../core/GameState.js';
 import { RadRoach, PlagueBat, SludgeCrawler, Raider, Brute, UFO } from '../entities/Enemy.js';
 import { Spikes, ToxicBarrel, SludgePuddle } from '../entities/Obstacle.js';
 import { Platform } from '../entities/Platform.js';
-import { HealthPack, TripleShot, HeavyMetal, ExtraHeart, Nuke } from '../entities/Powerup.js';
+import { HealthPack, TripleShot, HeavyMetal, ExtraHeart, Nuke, MissileLauncher, GrenadeLauncher } from '../entities/Powerup.js';
 
 export class SpawnSystem {
   constructor(scene) {
@@ -81,6 +81,8 @@ export class SpawnSystem {
     this.powerups.push(new HeavyMetal(scene)); // Rare, powerful
     this.powerups.push(new ExtraHeart(scene)); // Only 1 (very rare)
     this.powerups.push(new Nuke(scene));
+    this.powerups.push(new MissileLauncher(scene)); // Rare, heat-seeking missiles
+    this.powerups.push(new GrenadeLauncher(scene)); // Lobbed explosive grenades
     
     // Set initial spawn times
     this.resetSpawnTimers();
@@ -357,6 +359,8 @@ export class SpawnSystem {
       'TripleShot': TripleShot,
       'Nuke': Nuke,
       'ExtraHeart': ExtraHeart,
+      'MissileLauncher': MissileLauncher,
+      'GrenadeLauncher': GrenadeLauncher,
     };
     
     // For ExtraHeart, check if player already at max hearts
@@ -391,7 +395,9 @@ export class SpawnSystem {
       POWERUPS.HEALTH_PACK.SPAWN_WEIGHT +
       POWERUPS.TRIPLE_SHOT.SPAWN_WEIGHT +
       POWERUPS.HEAVY_METAL.SPAWN_WEIGHT +
-      POWERUPS.NUKE.SPAWN_WEIGHT;
+      POWERUPS.NUKE.SPAWN_WEIGHT +
+      POWERUPS.MISSILE_LAUNCHER.SPAWN_WEIGHT +
+      POWERUPS.GRENADE_LAUNCHER.SPAWN_WEIGHT;
     
     const roll = Math.random() * totalWeight;
     let PowerupType;
@@ -409,7 +415,17 @@ export class SpawnSystem {
         if (roll < cumulative) {
           PowerupType = HeavyMetal;
         } else {
-          PowerupType = Nuke;
+          cumulative += POWERUPS.NUKE.SPAWN_WEIGHT;
+          if (roll < cumulative) {
+            PowerupType = Nuke;
+          } else {
+            cumulative += POWERUPS.MISSILE_LAUNCHER.SPAWN_WEIGHT;
+            if (roll < cumulative) {
+              PowerupType = MissileLauncher;
+            } else {
+              PowerupType = GrenadeLauncher;
+            }
+          }
         }
       }
     }

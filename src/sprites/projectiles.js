@@ -61,6 +61,45 @@ export const ENEMY_BULLET = [
 ];
 
 // =============================================================================
+// HEAT-SEEKING MISSILE - Green military missile with orange exhaust (12x5)
+// Larger and more distinct than regular bullets
+// =============================================================================
+
+const G = 16; // toxic green (military)
+const g = 7;  // dark green (palette 7 = military green)
+const F = 5;  // fire/orange exhaust
+
+export const MISSILE = [
+  //0 1 2 3 4 5 6 7 8 9 0 1
+  [_,_,_,_,_,O,O,O,O,O,_,_],  // nose cone
+  [F,O,O,O,O,g,g,g,g,g,O,_],  // body top with exhaust
+  [F,F,O,g,g,g,W,W,g,g,g,O],  // body middle (white highlight)
+  [F,O,O,O,O,g,g,g,g,g,O,_],  // body bottom with exhaust
+  [_,_,_,_,_,O,O,O,O,O,_,_],  // tail fins
+];
+
+// =============================================================================
+// GRENADE - Round explosive with fuse/pin (8x8)
+// Military olive green body with gold fuse
+// =============================================================================
+
+const D = 2;  // dark gray (palette 2 - shadow)
+const v = 7;  // olive/military green (palette 7)
+const A = 6;  // gold/yellow (palette 6 - fuse)
+
+export const GRENADE = [
+  //0 1 2 3 4 5 6 7
+  [_,_,O,A,A,O,_,_],  // fuse/pin sticking up
+  [_,O,v,v,v,v,O,_],  // top of body
+  [O,v,v,W,W,v,v,O],  // body with highlight
+  [O,v,W,v,v,v,v,O],  // body
+  [O,v,v,v,v,v,v,O],  // body
+  [O,v,v,v,v,D,D,O],  // body with shadow
+  [_,O,v,v,D,D,O,_],  // bottom
+  [_,_,O,O,O,O,_,_],  // bottom edge
+];
+
+// =============================================================================
 // SPRITE DATA EXPORT
 // =============================================================================
 
@@ -88,6 +127,18 @@ export const PROJECTILE_SPRITES = {
     palette: PALETTE,
     width: 8,
     height: 4,
+  },
+  MISSILE: {
+    sprite: MISSILE,
+    palette: PALETTE,
+    width: 12,
+    height: 5,
+  },
+  GRENADE: {
+    sprite: GRENADE,
+    palette: PALETTE,
+    width: 8,
+    height: 8,
   },
 };
 

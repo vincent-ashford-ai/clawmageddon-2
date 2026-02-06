@@ -36,6 +36,11 @@ export const Events = {
   TRIPLE_SHOT_END: 'tripleShot:end',
   HEAVY_METAL_START: 'heavyMetal:start',
   HEAVY_METAL_END: 'heavyMetal:end',
+  MISSILE_LAUNCHER_START: 'missileLauncher:start',
+  MISSILE_LAUNCHER_END: 'missileLauncher:end',
+  GRENADE_LAUNCHER_START: 'grenadeLauncher:start',
+  GRENADE_LAUNCHER_END: 'grenadeLauncher:end',
+  GRENADE_EXPLODED: 'grenade:exploded',
   HEALTH_RESTORED: 'health:restored',
   EXTRA_HEART_GAINED: 'extraHeart:gained',
 

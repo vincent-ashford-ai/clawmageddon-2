@@ -148,6 +148,64 @@ export const NUKE = [
 ];
 
 // =============================================================================
+// MISSILE LAUNCHER - Military green launcher with missile (16x16)
+// Distinct from other weapons: tube launcher with visible missile
+// =============================================================================
+
+const M = 7;  // military green (palette 7)
+const A = 16; // army green (palette 16 - toxic green works for camo)
+const B = 2;  // dark gray (palette 2)
+
+export const MISSILE_LAUNCHER = [
+  //0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  [_,_,_,_,_,_,_,O,O,O,O,O,O,O,_,_], // missile tip
+  [_,_,_,_,_,_,O,M,M,M,M,M,M,M,O,_], // missile body
+  [_,_,_,_,_,_,_,O,O,O,O,O,O,O,_,_],
+  [_,_,_,_,_,O,O,O,O,O,O,O,O,O,O,_], // launcher tube
+  [_,_,_,O,O,A,A,A,A,A,A,A,A,A,A,O],
+  [_,_,O,A,A,A,A,A,A,A,A,A,A,A,A,O],
+  [_,O,A,A,A,A,A,A,A,A,A,A,A,O,O,_], // body
+  [O,A,A,A,A,A,A,A,A,A,A,O,O,_,_,_],
+  [O,A,A,A,A,A,A,A,A,O,O,_,_,_,_,_],
+  [O,A,A,A,A,A,A,A,O,_,_,_,_,_,_,_],
+  [_,O,B,B,B,B,O,O,_,_,_,_,_,_,_,_], // grip
+  [_,O,B,B,B,B,O,_,_,_,_,_,_,_,_,_],
+  [_,_,O,B,B,O,_,_,_,_,_,_,_,_,_,_],
+  [_,_,O,B,B,O,_,_,_,_,_,_,_,_,_,_],
+  [_,_,_,O,O,_,_,_,_,_,_,_,_,_,_,_],
+];
+
+// =============================================================================
+// GRENADE LAUNCHER - Olive green launcher with grenade (16x16)
+// Distinct tube launcher with visible grenade ready to fire
+// =============================================================================
+
+const GL = 7;  // olive green (palette 7)
+const GD = 2;  // dark gray (palette 2)
+const GY = 6;  // gold/yellow fuse (palette 6)
+
+export const GRENADE_LAUNCHER = [
+  //0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+  [_,_,_,_,_,_,_,_,O,GY,GY,O,_,_,_,_], // grenade fuse
+  [_,_,_,_,_,_,_,O,GL,GL,GL,GL,O,_,_,_], // grenade in tube
+  [_,_,_,_,_,_,O,GL,GL,GL,GL,GL,GL,O,_,_],
+  [_,_,_,_,_,O,O,O,O,O,O,O,O,O,O,_], // launcher tube top
+  [_,_,_,_,O,GL,GL,GL,GL,GL,GL,GL,GL,GL,O,_],
+  [_,_,_,O,GL,GL,GL,GL,GL,GL,GL,GL,GL,GL,GL,O], // tube body
+  [_,_,O,GL,GL,GL,GL,GL,GL,GL,GL,GL,GL,GL,GL,O],
+  [_,O,GL,GL,GL,GL,GL,GL,GL,GL,GL,GL,GL,O,O,_],
+  [O,GL,GL,GL,GL,GL,GL,GL,GL,GL,GL,O,O,_,_,_], // body
+  [O,GL,GL,GL,GL,GL,GL,GL,GL,O,O,_,_,_,_,_],
+  [O,GL,GL,GL,GL,GL,GL,GL,O,_,_,_,_,_,_,_],
+  [_,O,GD,GD,GD,GD,O,O,_,_,_,_,_,_,_,_], // grip
+  [_,O,GD,GD,GD,GD,O,_,_,_,_,_,_,_,_,_],
+  [_,_,O,GD,GD,O,_,_,_,_,_,_,_,_,_,_],
+  [_,_,O,GD,GD,O,_,_,_,_,_,_,_,_,_,_],
+  [_,_,_,O,O,_,_,_,_,_,_,_,_,_,_,_],
+];
+
+// =============================================================================
 // SPRITE DATA EXPORT
 // =============================================================================
 
@@ -178,6 +236,18 @@ export const ITEM_SPRITES = {
   },
   NUKE: {
     sprite: NUKE,
+    palette: PALETTE,
+    width: 16,
+    height: 16,
+  },
+  MISSILE_LAUNCHER: {
+    sprite: MISSILE_LAUNCHER,
+    palette: PALETTE,
+    width: 16,
+    height: 16,
+  },
+  GRENADE_LAUNCHER: {
+    sprite: GRENADE_LAUNCHER,
     palette: PALETTE,
     width: 16,
     height: 16,

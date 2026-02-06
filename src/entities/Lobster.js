@@ -18,6 +18,8 @@ import {
 const WEAPON_DEFAULT = 'default';
 const WEAPON_TRIPLE = 'triple';
 const WEAPON_HEAVY = 'heavy';
+const WEAPON_MISSILE = 'missile';
+const WEAPON_GRENADE = 'grenade';
 
 export class Lobster {
   constructor(scene) {
@@ -28,6 +30,8 @@ export class Lobster {
     this.wasOnGround = true; // Track for landing detection
     this.isDead = false; // Local death flag to prevent input during death animation
     this.lastHeavyMetalFire = 0; // Track last auto-fire time for Heavy Metal
+    this.lastMissileFire = 0; // Track last fire time for Missile Launcher
+    this.lastGrenadeFire = 0; // Track last fire time for Grenade Launcher
     this.currentWeapon = WEAPON_DEFAULT; // Track current weapon visual state
     
     this.createSprite();
@@ -121,6 +125,10 @@ export class Lobster {
     eventBus.on(Events.TRIPLE_SHOT_END, this.onTripleShotEnd, this);
     eventBus.on(Events.HEAVY_METAL_START, this.onHeavyMetalStart, this);
     eventBus.on(Events.HEAVY_METAL_END, this.onHeavyMetalEnd, this);
+    eventBus.on(Events.MISSILE_LAUNCHER_START, this.onMissileLauncherStart, this);
+    eventBus.on(Events.MISSILE_LAUNCHER_END, this.onMissileLauncherEnd, this);
+    eventBus.on(Events.GRENADE_LAUNCHER_START, this.onGrenadeLauncherStart, this);
+    eventBus.on(Events.GRENADE_LAUNCHER_END, this.onGrenadeLauncherEnd, this);
   }
 
   onTripleShotStart() {
@@ -148,13 +156,55 @@ export class Lobster {
     }
   }
 
+  onMissileLauncherStart() {
+    // Missile Launcher uses same visuals as heavy (or we could add custom sprites later)
+    this.setWeaponState(WEAPON_MISSILE);
+  }
+
+  onMissileLauncherEnd() {
+    // Revert to appropriate weapon state
+    if (gameState.hasHeavyMetal) {
+      this.setWeaponState(WEAPON_HEAVY);
+    } else if (gameState.hasTripleShot) {
+      this.setWeaponState(WEAPON_TRIPLE);
+    } else {
+      this.setWeaponState(WEAPON_DEFAULT);
+    }
+  }
+
+  onGrenadeLauncherStart() {
+    // Grenade Launcher uses heavy weapon visuals (or we could add custom sprites later)
+    this.setWeaponState(WEAPON_GRENADE);
+  }
+
+  onGrenadeLauncherEnd() {
+    // Revert to appropriate weapon state
+    if (gameState.hasHeavyMetal) {
+      this.setWeaponState(WEAPON_HEAVY);
+    } else if (gameState.hasMissileLauncher) {
+      this.setWeaponState(WEAPON_MISSILE);
+    } else if (gameState.hasTripleShot) {
+      this.setWeaponState(WEAPON_TRIPLE);
+    } else {
+      this.setWeaponState(WEAPON_DEFAULT);
+    }
+  }
+
   setWeaponState(weaponState) {
     if (this.currentWeapon === weaponState) return;
     
     this.currentWeapon = weaponState;
     
     // Determine suffix for animation keys
-    const suffix = weaponState === WEAPON_DEFAULT ? '' : `-${weaponState}`;
+    // Missile and Grenade use heavy weapon visuals (same gatling gun look)
+    let suffix;
+    if (weaponState === WEAPON_DEFAULT) {
+      suffix = '';
+    } else if (weaponState === WEAPON_MISSILE || weaponState === WEAPON_GRENADE) {
+      suffix = '-heavy'; // Reuse heavy weapon sprites for missile/grenade launcher
+    } else {
+      suffix = `-${weaponState}`;
+    }
     
     // Get current animation type (walk or jump)
     const currentAnim = this.sprite.anims.currentAnim?.key || 'lobster-walk';
@@ -166,12 +216,26 @@ export class Lobster {
   }
 
   getWalkAnimKey() {
-    const suffix = this.currentWeapon === WEAPON_DEFAULT ? '' : `-${this.currentWeapon}`;
+    let suffix;
+    if (this.currentWeapon === WEAPON_DEFAULT) {
+      suffix = '';
+    } else if (this.currentWeapon === WEAPON_MISSILE || this.currentWeapon === WEAPON_GRENADE) {
+      suffix = '-heavy'; // Reuse heavy weapon sprites
+    } else {
+      suffix = `-${this.currentWeapon}`;
+    }
     return `lobster-walk${suffix}`;
   }
 
   getJumpAnimKey() {
-    const suffix = this.currentWeapon === WEAPON_DEFAULT ? '' : `-${this.currentWeapon}`;
+    let suffix;
+    if (this.currentWeapon === WEAPON_DEFAULT) {
+      suffix = '';
+    } else if (this.currentWeapon === WEAPON_MISSILE || this.currentWeapon === WEAPON_GRENADE) {
+      suffix = '-heavy'; // Reuse heavy weapon sprites
+    } else {
+      suffix = `-${this.currentWeapon}`;
+    }
     return `lobster-jump${suffix}`;
   }
 
@@ -213,9 +277,9 @@ export class Lobster {
       }
     }
 
-    // Handle tap/space action: Jump (+ Shoot if not Heavy Metal)
+    // Handle tap/space action: Jump (+ Shoot if not using auto-fire weapons)
     if (actionPressed) {
-      // Only manually shoot if NOT using Heavy Metal (it auto-fires)
+      // Only manually shoot if NOT using auto-fire weapons (Heavy Metal only)
       if (!gameState.hasHeavyMetal) {
         this.shoot();
       }
@@ -248,6 +312,50 @@ export class Lobster {
   shoot() {
     const muzzleX = this.sprite.x + PLAYER.WIDTH / 2 + 10;
     const muzzleY = this.sprite.y - 5;
+    const now = this.scene.time.now;
+    
+    // Grenade Launcher: fire a lobbed grenade (manual fire with fire rate limit)
+    if (gameState.hasGrenadeLauncher) {
+      // Check fire rate
+      if (now - this.lastGrenadeFire < POWERUPS.GRENADE_LAUNCHER.FIRE_RATE) {
+        return; // Too soon to fire again
+      }
+      this.lastGrenadeFire = now;
+      
+      gameState.useGrenadeAmmo();
+      eventBus.emit(Events.PROJECTILE_FIRED, {
+        x: muzzleX,
+        y: muzzleY,
+        grenade: true,
+        direction: 1, // Always fire right
+      });
+      
+      // Muzzle flash particles
+      eventBus.emit(Events.PARTICLES_MUZZLE, { x: muzzleX, y: muzzleY });
+      eventBus.emit(Events.PLAYER_SHOOT);
+      return;
+    }
+    
+    // Missile Launcher: fire a heat-seeking missile (manual fire with fire rate limit)
+    if (gameState.hasMissileLauncher) {
+      // Check fire rate
+      if (now - this.lastMissileFire < POWERUPS.MISSILE_LAUNCHER.FIRE_RATE) {
+        return; // Too soon to fire again
+      }
+      this.lastMissileFire = now;
+      
+      gameState.useMissileAmmo();
+      eventBus.emit(Events.PROJECTILE_FIRED, {
+        x: muzzleX,
+        y: muzzleY,
+        missile: true, // Heat-seeking missile
+      });
+      
+      // Muzzle flash particles
+      eventBus.emit(Events.PARTICLES_MUZZLE, { x: muzzleX, y: muzzleY });
+      eventBus.emit(Events.PLAYER_SHOOT);
+      return;
+    }
     
     if (gameState.hasTripleShot) {
       gameState.useTripleAmmo();
@@ -389,6 +497,10 @@ export class Lobster {
     eventBus.off(Events.TRIPLE_SHOT_END, this.onTripleShotEnd, this);
     eventBus.off(Events.HEAVY_METAL_START, this.onHeavyMetalStart, this);
     eventBus.off(Events.HEAVY_METAL_END, this.onHeavyMetalEnd, this);
+    eventBus.off(Events.MISSILE_LAUNCHER_START, this.onMissileLauncherStart, this);
+    eventBus.off(Events.MISSILE_LAUNCHER_END, this.onMissileLauncherEnd, this);
+    eventBus.off(Events.GRENADE_LAUNCHER_START, this.onGrenadeLauncherStart, this);
+    eventBus.off(Events.GRENADE_LAUNCHER_END, this.onGrenadeLauncherEnd, this);
     
     this.sprite.destroy();
   }

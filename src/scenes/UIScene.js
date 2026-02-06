@@ -80,6 +80,20 @@ export class UIScene extends Phaser.Scene {
       color: '#ff4400',
     }).setOrigin(0, 1);
 
+    // Missile Launcher ammo indicator
+    this.missileText = this.add.text(UI.PADDING, GAME.HEIGHT - UI.PADDING - 20, '', {
+      fontSize: '18px',
+      fontFamily: 'monospace',
+      color: '#00aaff',
+    }).setOrigin(0, 1);
+
+    // Grenade Launcher ammo indicator
+    this.grenadeText = this.add.text(UI.PADDING, GAME.HEIGHT - UI.PADDING - 20, '', {
+      fontSize: '18px',
+      fontFamily: 'monospace',
+      color: '#44ff44',
+    }).setOrigin(0, 1);
+
     // Setup event listeners
     this.setupEventListeners();
     
@@ -145,7 +159,7 @@ export class UIScene extends Phaser.Scene {
     };
     eventBus.on(Events.TRIPLE_SHOT_END, this.onTripleShotEnd);
 
-    // Update triple ammo on each shot
+    // Update ammo on each shot
     this.onShoot = () => {
       if (gameState.hasTripleShot) {
         this.tripleText.setText(`TRIPLE SHOT: ${gameState.tripleAmmo}`);
@@ -153,12 +167,20 @@ export class UIScene extends Phaser.Scene {
       if (gameState.hasHeavyMetal) {
         this.heavyMetalText.setText(`HEAVY METAL: ${gameState.heavyMetalAmmo}`);
       }
+      if (gameState.hasMissileLauncher) {
+        this.missileText.setText(`MISSILE: ${gameState.missileAmmo}`);
+      }
+      if (gameState.hasGrenadeLauncher) {
+        this.grenadeText.setText(`GRENADE: ${gameState.grenadeAmmo}`);
+      }
     };
     eventBus.on(Events.PLAYER_SHOOT, this.onShoot);
 
     // Heavy Metal powerup
     this.onHeavyMetalStart = ({ ammo }) => {
-      this.tripleText.setText(''); // Clear triple shot display
+      this.tripleText.setText(''); // Clear other weapon displays
+      this.missileText.setText('');
+      this.grenadeText.setText('');
       this.heavyMetalText.setText(`HEAVY METAL: ${ammo}`);
     };
     eventBus.on(Events.HEAVY_METAL_START, this.onHeavyMetalStart);
@@ -167,6 +189,34 @@ export class UIScene extends Phaser.Scene {
       this.heavyMetalText.setText('');
     };
     eventBus.on(Events.HEAVY_METAL_END, this.onHeavyMetalEnd);
+
+    // Missile Launcher powerup
+    this.onMissileLauncherStart = ({ ammo }) => {
+      this.tripleText.setText(''); // Clear other weapon displays
+      this.heavyMetalText.setText('');
+      this.grenadeText.setText('');
+      this.missileText.setText(`MISSILE: ${ammo}`);
+    };
+    eventBus.on(Events.MISSILE_LAUNCHER_START, this.onMissileLauncherStart);
+
+    this.onMissileLauncherEnd = () => {
+      this.missileText.setText('');
+    };
+    eventBus.on(Events.MISSILE_LAUNCHER_END, this.onMissileLauncherEnd);
+
+    // Grenade Launcher powerup
+    this.onGrenadeLauncherStart = ({ ammo }) => {
+      this.tripleText.setText(''); // Clear other weapon displays
+      this.heavyMetalText.setText('');
+      this.missileText.setText('');
+      this.grenadeText.setText(`GRENADE: ${ammo}`);
+    };
+    eventBus.on(Events.GRENADE_LAUNCHER_START, this.onGrenadeLauncherStart);
+
+    this.onGrenadeLauncherEnd = () => {
+      this.grenadeText.setText('');
+    };
+    eventBus.on(Events.GRENADE_LAUNCHER_END, this.onGrenadeLauncherEnd);
 
     // Player damaged - flash hearts
     this.onDamaged = () => {
@@ -264,5 +314,9 @@ export class UIScene extends Phaser.Scene {
     eventBus.off(Events.PLAYER_DAMAGED, this.onDamaged);
     eventBus.off(Events.HEAVY_METAL_START, this.onHeavyMetalStart);
     eventBus.off(Events.HEAVY_METAL_END, this.onHeavyMetalEnd);
+    eventBus.off(Events.MISSILE_LAUNCHER_START, this.onMissileLauncherStart);
+    eventBus.off(Events.MISSILE_LAUNCHER_END, this.onMissileLauncherEnd);
+    eventBus.off(Events.GRENADE_LAUNCHER_START, this.onGrenadeLauncherStart);
+    eventBus.off(Events.GRENADE_LAUNCHER_END, this.onGrenadeLauncherEnd);
   }
 }

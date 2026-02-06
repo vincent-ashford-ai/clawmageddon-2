@@ -209,10 +209,11 @@ export const PLATFORMS = {
   
   // Which powerups can spawn on each tier
   // ExtraHeart ONLY on HIGH tier (rewarding difficult jumps)
+  // MissileLauncher and GrenadeLauncher on MEDIUM and HIGH (rare, powerful)
   POWERUP_TYPES: {
     LOW: ['HealthPack', 'TripleShot', 'Nuke'],
-    MEDIUM: ['HealthPack', 'TripleShot', 'Nuke'],
-    HIGH: ['HealthPack', 'TripleShot', 'Nuke', 'ExtraHeart'],
+    MEDIUM: ['HealthPack', 'TripleShot', 'Nuke', 'MissileLauncher', 'GrenadeLauncher'],
+    HIGH: ['HealthPack', 'TripleShot', 'Nuke', 'ExtraHeart', 'MissileLauncher', 'GrenadeLauncher'],
   },
 };
 
@@ -256,6 +257,31 @@ export const POWERUPS = {
     COLOR: 0xffff00,
     SYMBOL_COLOR: 0x000000,
     SPAWN_WEIGHT: 20,
+  },
+  
+  MISSILE_LAUNCHER: {
+    COLOR: 0x44aa44,           // Military green
+    ACCENT_COLOR: 0xff4400,    // Orange exhaust
+    SPAWN_WEIGHT: 8,           // Rare powerful powerup
+    AMMO: 25,                  // 25 heat-seeking missiles
+    FIRE_RATE: 400,            // ms between missiles (slower than Heavy Metal)
+    MISSILE_SPEED: 350,        // Slightly slower than bullets for tracking time
+    TURN_RATE: 0.08,           // Radians per frame to turn toward target
+    TRAIL_INTERVAL: 50,        // ms between trail particles
+  },
+  
+  GRENADE_LAUNCHER: {
+    COLOR: 0x556b2f,           // Dark olive green
+    ACCENT_COLOR: 0xffd700,    // Gold fuse
+    SPAWN_WEIGHT: 10,          // Moderate rarity
+    AMMO: 50,                  // 50 grenades
+    FIRE_RATE: 350,            // ms between grenade launches
+    GRENADE_SPEED_X: 300,      // Horizontal velocity
+    GRENADE_SPEED_Y: -250,     // Initial upward velocity (for arc)
+    GRENADE_GRAVITY: 800,      // Gravity applied to grenades
+    SPIN_VELOCITY: 360,        // Degrees per second spin
+    EXPLOSION_RADIUS: 60,      // Area damage radius
+    EXPLOSION_DAMAGE: 3,       // Damage dealt in explosion
   },
 };
 

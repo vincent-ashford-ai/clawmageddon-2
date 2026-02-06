@@ -9,15 +9,45 @@ import { eventBus, Events } from '../core/EventBus.js';
 import { gameState } from '../core/GameState.js';
 import { renderPixelArt } from '../core/PixelRenderer.js';
 import { generateGameOverScreen, SCREEN_PALETTE } from '../sprites/screens.js';
+import { toggleMute } from '../audio/AudioBridge.js';
 
 export class GameOverScene extends Phaser.Scene {
   constructor() {
     super('GameOverScene');
+    this.isMuted = false;
   }
 
   create() {
     const cx = GAME.WIDTH / 2;
     const cy = GAME.HEIGHT / 2;
+
+    // Mute button (top right corner) - consistent across all screens
+    this.muteButton = this.add.text(GAME.WIDTH - UI.PADDING, UI.PADDING, '🔊', {
+      fontSize: '28px',
+    }).setOrigin(1, 0).setInteractive({ useHandCursor: true }).setDepth(100);
+    
+    this.muteButton.on('pointerdown', () => {
+      this.isMuted = toggleMute();
+      this.muteButton.setText(this.isMuted ? '🔇' : '🔊');
+      
+      // Visual feedback - quick scale pop
+      this.tweens.add({
+        targets: this.muteButton,
+        scaleX: 1.3,
+        scaleY: 1.3,
+        duration: 100,
+        yoyo: true,
+        ease: 'Quad.easeOut',
+      });
+    });
+    
+    // Hover effect
+    this.muteButton.on('pointerover', () => {
+      this.muteButton.setAlpha(0.7);
+    });
+    this.muteButton.on('pointerout', () => {
+      this.muteButton.setAlpha(1);
+    });
 
     // Generate and render the epic game over screen art
     this.createDramaticBackground();

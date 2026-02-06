@@ -32,6 +32,10 @@ class GameState {
     this.tripleAmmo = 0;
     this.hasHeavyMetal = false;
     this.heavyMetalAmmo = 0;
+    this.hasMissileLauncher = false;
+    this.missileAmmo = 0;
+    this.hasGrenadeLauncher = false;
+    this.grenadeAmmo = 0;
 
     // Stats
     this.enemiesKilled = 0;
@@ -126,11 +130,21 @@ class GameState {
 
   // ----- Power-up Methods -----
   activateTripleShot() {
-    // Drop Heavy Metal if active (weapons don't stack)
+    // Drop other weapons if active (weapons don't stack)
     if (this.hasHeavyMetal) {
       this.hasHeavyMetal = false;
       this.heavyMetalAmmo = 0;
       eventBus.emit(Events.HEAVY_METAL_END);
+    }
+    if (this.hasMissileLauncher) {
+      this.hasMissileLauncher = false;
+      this.missileAmmo = 0;
+      eventBus.emit(Events.MISSILE_LAUNCHER_END);
+    }
+    if (this.hasGrenadeLauncher) {
+      this.hasGrenadeLauncher = false;
+      this.grenadeAmmo = 0;
+      eventBus.emit(Events.GRENADE_LAUNCHER_END);
     }
     
     this.hasTripleShot = true;
@@ -149,11 +163,21 @@ class GameState {
   }
 
   activateHeavyMetal() {
-    // Drop Triple Shot if active (weapons don't stack)
+    // Drop other weapons if active (weapons don't stack)
     if (this.hasTripleShot) {
       this.hasTripleShot = false;
       this.tripleAmmo = 0;
       eventBus.emit(Events.TRIPLE_SHOT_END);
+    }
+    if (this.hasMissileLauncher) {
+      this.hasMissileLauncher = false;
+      this.missileAmmo = 0;
+      eventBus.emit(Events.MISSILE_LAUNCHER_END);
+    }
+    if (this.hasGrenadeLauncher) {
+      this.hasGrenadeLauncher = false;
+      this.grenadeAmmo = 0;
+      eventBus.emit(Events.GRENADE_LAUNCHER_END);
     }
     
     this.hasHeavyMetal = true;
@@ -170,6 +194,74 @@ class GameState {
       this.heavyMetalAmmo = 0;
       this.hasHeavyMetal = false;
       eventBus.emit(Events.HEAVY_METAL_END);
+    }
+  }
+
+  activateMissileLauncher() {
+    // Drop other weapons (weapons don't stack)
+    if (this.hasTripleShot) {
+      this.hasTripleShot = false;
+      this.tripleAmmo = 0;
+      eventBus.emit(Events.TRIPLE_SHOT_END);
+    }
+    if (this.hasHeavyMetal) {
+      this.hasHeavyMetal = false;
+      this.heavyMetalAmmo = 0;
+      eventBus.emit(Events.HEAVY_METAL_END);
+    }
+    if (this.hasGrenadeLauncher) {
+      this.hasGrenadeLauncher = false;
+      this.grenadeAmmo = 0;
+      eventBus.emit(Events.GRENADE_LAUNCHER_END);
+    }
+    
+    this.hasMissileLauncher = true;
+    this.missileAmmo = POWERUPS.MISSILE_LAUNCHER.AMMO;
+    eventBus.emit(Events.MISSILE_LAUNCHER_START, { ammo: this.missileAmmo });
+  }
+
+  useMissileAmmo() {
+    if (!this.hasMissileLauncher) return;
+    
+    this.missileAmmo--;
+    if (this.missileAmmo <= 0) {
+      this.missileAmmo = 0;
+      this.hasMissileLauncher = false;
+      eventBus.emit(Events.MISSILE_LAUNCHER_END);
+    }
+  }
+
+  activateGrenadeLauncher() {
+    // Drop other weapons (weapons don't stack)
+    if (this.hasTripleShot) {
+      this.hasTripleShot = false;
+      this.tripleAmmo = 0;
+      eventBus.emit(Events.TRIPLE_SHOT_END);
+    }
+    if (this.hasHeavyMetal) {
+      this.hasHeavyMetal = false;
+      this.heavyMetalAmmo = 0;
+      eventBus.emit(Events.HEAVY_METAL_END);
+    }
+    if (this.hasMissileLauncher) {
+      this.hasMissileLauncher = false;
+      this.missileAmmo = 0;
+      eventBus.emit(Events.MISSILE_LAUNCHER_END);
+    }
+    
+    this.hasGrenadeLauncher = true;
+    this.grenadeAmmo = POWERUPS.GRENADE_LAUNCHER.AMMO;
+    eventBus.emit(Events.GRENADE_LAUNCHER_START, { ammo: this.grenadeAmmo });
+  }
+
+  useGrenadeAmmo() {
+    if (!this.hasGrenadeLauncher) return;
+    
+    this.grenadeAmmo--;
+    if (this.grenadeAmmo <= 0) {
+      this.grenadeAmmo = 0;
+      this.hasGrenadeLauncher = false;
+      eventBus.emit(Events.GRENADE_LAUNCHER_END);
     }
   }
 

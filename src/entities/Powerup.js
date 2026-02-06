@@ -1,6 +1,6 @@
 // =============================================================================
 // CLAWMAGEDDON 2 - POWER-UPS
-// Health pack, triple shot, extra heart, and nuke.
+// Health pack, triple shot, extra heart, nuke, and missile launcher.
 // =============================================================================
 
 import Phaser from 'phaser';
@@ -333,5 +333,73 @@ export class Nuke extends Powerup {
     eventBus.emit(Events.SCREEN_FLASH, { color: 0xffffff, duration: 200 });
     eventBus.emit(Events.SCREEN_SHAKE, { intensity: 15 });
     eventBus.emit(Events.SFX_PLAY, { sound: 'explosion' });
+  }
+}
+
+// =============================================================================
+// GRENADE LAUNCHER - Olive green launcher, fires lobbed grenades
+// =============================================================================
+export class GrenadeLauncher extends Powerup {
+  constructor(scene) {
+    super(scene, POWERUPS.GRENADE_LAUNCHER, 'grenadeLauncher');
+  }
+
+  createSprite() {
+    const { scene } = this;
+    const size = POWERUPS.SIZE;
+    const texKey = 'powerup-grenadelauncher';
+    
+    // Render pixel art (16x16 at scale 2 = 32x32)
+    renderPixelArt(scene, ITEM_SPRITES.GRENADE_LAUNCHER.sprite, ITEM_PALETTE, texKey, 2);
+    
+    this.sprite = scene.physics.add.sprite(0, 0, texKey);
+    this.sprite.body.setSize(size, size);
+    this.sprite.body.setOffset(
+      (this.sprite.width - size) / 2,
+      (this.sprite.height - size) / 2
+    );
+    this.sprite.body.setAllowGravity(false);
+    
+    this.deactivate();
+  }
+
+  applyEffect() {
+    gameState.activateGrenadeLauncher();
+    eventBus.emit(Events.SCREEN_FLASH, { color: 0x556b2f, duration: 150 });
+    eventBus.emit(Events.SFX_PLAY, { sound: 'powerup_special' });
+  }
+}
+
+// =============================================================================
+// MISSILE LAUNCHER - Heat-seeking missiles that home in on enemies
+// =============================================================================
+export class MissileLauncher extends Powerup {
+  constructor(scene) {
+    super(scene, POWERUPS.MISSILE_LAUNCHER, 'missileLauncher');
+  }
+
+  createSprite() {
+    const { scene } = this;
+    const size = POWERUPS.SIZE;
+    const texKey = 'powerup-missilelauncher';
+    
+    // Render pixel art (16x16 at scale 2 = 32x32)
+    renderPixelArt(scene, ITEM_SPRITES.MISSILE_LAUNCHER.sprite, ITEM_PALETTE, texKey, 2);
+    
+    this.sprite = scene.physics.add.sprite(0, 0, texKey);
+    this.sprite.body.setSize(size, size);
+    this.sprite.body.setOffset(
+      (this.sprite.width - size) / 2,
+      (this.sprite.height - size) / 2
+    );
+    this.sprite.body.setAllowGravity(false);
+    
+    this.deactivate();
+  }
+
+  applyEffect() {
+    gameState.activateMissileLauncher();
+    eventBus.emit(Events.SCREEN_FLASH, { color: 0x44aa44, duration: 150 });
+    eventBus.emit(Events.SFX_PLAY, { sound: 'powerup_special' });
   }
 }

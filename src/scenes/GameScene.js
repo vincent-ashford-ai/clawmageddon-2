@@ -8,7 +8,7 @@ import { GAME, PLAYER, PARALLAX, OBSTACLES, TIMING, COLORS } from '../core/Const
 import { eventBus, Events } from '../core/EventBus.js';
 import { gameState } from '../core/GameState.js';
 import { Lobster } from '../entities/Lobster.js';
-import { ProjectilePool, EnemyProjectilePool } from '../entities/Projectile.js';
+import { ProjectilePool, EnemyProjectilePool, MissilePool, GrenadePool } from '../entities/Projectile.js';
 import { SpawnSystem } from '../systems/SpawnSystem.js';
 import { ParticleSystem } from '../systems/ParticleSystem.js';
 import { EffectsSystem } from '../systems/EffectsSystem.js';
@@ -37,6 +37,12 @@ export class GameScene extends Phaser.Scene {
     
     // Create enemy projectile pool (Raider bullets)
     this.enemyProjectilePool = new EnemyProjectilePool(this);
+    
+    // Create missile pool (heat-seeking missiles)
+    this.missilePool = new MissilePool(this);
+    
+    // Create grenade pool (lobbed explosives)
+    this.grenadePool = new GrenadePool(this);
     
     // Create spawn system
     this.spawnSystem = new SpawnSystem(this);
@@ -242,6 +248,22 @@ export class GameScene extends Phaser.Scene {
     };
     eventBus.on(Events.PLAYER_DIED, this.onPlayerDied, this);
     
+    // Grenade explosion - deal area damage to nearby enemies
+    this.onGrenadeExploded = ({ x, y, radius, damage }) => {
+      const activeEnemies = this.spawnSystem.getActiveEnemies();
+      for (const enemy of activeEnemies) {
+        const dx = enemy.sprite.x - x;
+        const dy = enemy.sprite.y - y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist <= radius) {
+          // Deal damage to enemies in blast radius
+          enemy.hit(damage);
+        }
+      }
+    };
+    eventBus.on(Events.GRENADE_EXPLODED, this.onGrenadeExploded, this);
+    
     // Cleanup on shutdown
     this.events.on('shutdown', this.cleanup, this);
   }
@@ -256,9 +278,11 @@ export class GameScene extends Phaser.Scene {
     // Update player
     this.lobster.update(actionPressed);
     
-    // Update projectiles (player and enemy)
+    // Update projectiles (player, enemy, missiles, and grenades)
     this.projectilePool.update();
     this.enemyProjectilePool.update();
+    this.missilePool.update();
+    this.grenadePool.update();
     
     // Update spawn system (enemies, obstacles, platforms, powerups)
     this.spawnSystem.update();
@@ -307,6 +331,44 @@ export class GameScene extends Phaser.Scene {
         if (this.physics.overlap(projectile.sprite, enemy.sprite)) {
           enemy.hit(1);
           projectile.deactivate();
+          break;
+        }
+      }
+    }
+    
+    // Missiles vs Enemies (heat-seeking missiles)
+    const activeMissiles = this.missilePool.getActiveProjectiles();
+    for (const missile of activeMissiles) {
+      for (const enemy of activeEnemies) {
+        // Only check collision if enemy is on-screen
+        if (enemy.sprite.x > GAME.WIDTH + 20) continue;
+        
+        if (this.physics.overlap(missile.sprite, enemy.sprite)) {
+          enemy.hit(2); // Missiles deal 2 damage
+          missile.deactivate();
+          
+          // Explosion particles at impact point
+          eventBus.emit(Events.PARTICLES_DEATH, {
+            x: missile.sprite.x,
+            y: missile.sprite.y,
+            color: 0xff4400, // Orange explosion
+          });
+          eventBus.emit(Events.SCREEN_SHAKE, { intensity: 4 });
+          break;
+        }
+      }
+    }
+    
+    // Grenades vs Enemies (lobbed explosives)
+    const activeGrenades = this.grenadePool.getActiveProjectiles();
+    for (const grenade of activeGrenades) {
+      for (const enemy of activeEnemies) {
+        // Only check collision if enemy is on-screen
+        if (enemy.sprite.x > GAME.WIDTH + 20) continue;
+        
+        if (this.physics.overlap(grenade.sprite, enemy.sprite)) {
+          // Grenade explodes on enemy contact
+          grenade.explode();
           break;
         }
       }
@@ -413,6 +475,7 @@ export class GameScene extends Phaser.Scene {
     eventBus.off(Events.SCREEN_SHAKE, this.onScreenShake, this);
     eventBus.off(Events.SCREEN_FLASH, this.onScreenFlash, this);
     eventBus.off(Events.PLAYER_DIED, this.onPlayerDied, this);
+    eventBus.off(Events.GRENADE_EXPLODED, this.onGrenadeExploded, this);
     
     if (this.difficultyTimer) {
       this.difficultyTimer.destroy();
@@ -424,6 +487,14 @@ export class GameScene extends Phaser.Scene {
     
     if (this.enemyProjectilePool) {
       this.enemyProjectilePool.destroy();
+    }
+    
+    if (this.missilePool) {
+      this.missilePool.destroy();
+    }
+    
+    if (this.grenadePool) {
+      this.grenadePool.destroy();
     }
     
     if (this.spawnSystem) {
