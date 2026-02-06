@@ -76,6 +76,7 @@ export const Events = {
 
   // Audio (used by audio system)
   AUDIO_INIT: 'audio:init',
+  AUDIO_READY: 'audio:ready',
   MUSIC_MENU: 'music:menu',
   MUSIC_GAMEPLAY: 'music:gameplay',
   MUSIC_GAMEOVER: 'music:gameover',
