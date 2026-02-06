@@ -11,6 +11,7 @@ class AudioManager {
     this.initialized = false;
     this.currentMusic = null;
     this.muted = false;
+    this.pendingMusic = null; // Queue for music requested before init
   }
 
   /**
@@ -24,6 +25,13 @@ class AudioManager {
     // We just need to mark ourselves as ready
     this.initialized = true;
     console.log('[Audio] AudioManager ready');
+    
+    // Play any pending music that was requested before init
+    if (this.pendingMusic && !this.muted) {
+      console.log('[Audio] Playing pending music');
+      this.playMusic(this.pendingMusic);
+      this.pendingMusic = null;
+    }
   }
 
   /**
@@ -31,7 +39,13 @@ class AudioManager {
    * @param {Function} patternFn - Function that returns a Strudel pattern with .play()
    */
   playMusic(patternFn) {
-    if (!this.initialized || this.muted) return;
+    // If not initialized yet, queue it for later
+    if (!this.initialized) {
+      console.log('[Audio] Queuing music (not initialized yet)');
+      this.pendingMusic = patternFn;
+      return;
+    }
+    if (this.muted) return;
     this.stopMusic();
     // hush() needs a scheduler tick to process before new pattern starts
     setTimeout(() => {

@@ -4,7 +4,23 @@
 // Post-apocalyptic, intense, 8-bit chiptune style.
 // =============================================================================
 
-import { note, s, stack } from '@strudel/web';
+import { note, stack } from '@strudel/web';
+
+// =============================================================================
+// SYNTHESIZED DRUMS (no samples needed - works immediately)
+// =============================================================================
+
+// Kick drum - sine wave with pitch drop
+const kick = () => note('c1').s('sine').gain(0.5).decay(0.15).sustain(0);
+
+// Snare - noise burst with tone
+const snare = () => note('c3').s('square').gain(0.25).decay(0.08).sustain(0).lpf(2000);
+
+// Hi-hat - high noise burst  
+const hihat = () => note('c6').s('square').gain(0.12).decay(0.03).sustain(0).hpf(8000);
+
+// Open hi-hat - longer decay
+const openhat = () => note('c6').s('square').gain(0.15).decay(0.12).sustain(0).hpf(6000);
 
 /**
  * Menu Theme - Tense, atmospheric, building anticipation
@@ -149,42 +165,58 @@ export function gameplayTheme() {
       .sustain(0.5),
 
     // =========================================================================
-    // DRUMS - Metal kit: double-kick, snare on 2&4, fast hats
+    // DRUMS - Synthesized metal kit (no samples needed)
     // =========================================================================
     
-    // Kick drum - driving double-kick pattern
-    s(`
-      [bd bd ~ bd bd ~ bd bd] [bd bd ~ bd bd bd bd bd]
-      [bd bd ~ bd bd ~ bd bd] [bd bd bd bd bd bd bd bd]
-      [bd bd ~ bd bd ~ bd bd] [bd ~ bd ~ bd ~ bd bd]
-      [bd bd ~ bd bd ~ bd bd] [bd bd bd bd bd ~ ~ ~]
+    // Kick drum - driving double-kick pattern (sine wave with pitch drop)
+    note(`
+      [c1 c1 ~ c1 c1 ~ c1 c1] [c1 c1 ~ c1 c1 c1 c1 c1]
+      [c1 c1 ~ c1 c1 ~ c1 c1] [c1 c1 c1 c1 c1 c1 c1 c1]
+      [c1 c1 ~ c1 c1 ~ c1 c1] [c1 ~ c1 ~ c1 ~ c1 c1]
+      [c1 c1 ~ c1 c1 ~ c1 c1] [c1 c1 c1 c1 c1 ~ ~ ~]
     `)
-      .gain(0.38),
+      .s('sine')
+      .gain(0.45)
+      .decay(0.12)
+      .sustain(0),
 
-    // Snare - backbeat with fills
-    s(`
-      [~ ~ sd ~ ~ ~ sd ~] [~ ~ sd ~ ~ ~ sd ~]
-      [~ ~ sd ~ ~ ~ sd ~] [~ ~ sd ~ sd sd sd sd]
-      [~ ~ sd ~ ~ ~ sd ~] [~ ~ sd ~ ~ ~ sd ~]
-      [~ ~ sd ~ ~ ~ sd ~] [sd ~ sd ~ sd ~ ~ ~]
+    // Snare - backbeat with fills (noise-like square)
+    note(`
+      [~ ~ c4 ~ ~ ~ c4 ~] [~ ~ c4 ~ ~ ~ c4 ~]
+      [~ ~ c4 ~ ~ ~ c4 ~] [~ ~ c4 ~ c4 c4 c4 c4]
+      [~ ~ c4 ~ ~ ~ c4 ~] [~ ~ c4 ~ ~ ~ c4 ~]
+      [~ ~ c4 ~ ~ ~ c4 ~] [c4 ~ c4 ~ c4 ~ ~ ~]
     `)
-      .gain(0.32),
+      .s('square')
+      .gain(0.28)
+      .decay(0.08)
+      .sustain(0)
+      .lpf(2500)
+      .hpf(200),
 
-    // Hi-hats - 16th note drive with open hat accents
-    s(`
-      [hh hh hh hh hh hh oh hh]*4
-      [hh hh hh hh hh hh oh hh]*3 [hh hh hh hh oh oh oh oh]
+    // Hi-hats - 16th note drive (high square bursts)
+    note(`
+      [g7 g7 g7 g7 g7 g7 a7 g7]*4
+      [g7 g7 g7 g7 g7 g7 a7 g7]*3 [g7 g7 g7 g7 a7 a7 a7 a7]
     `)
-      .gain(0.22),
+      .s('square')
+      .gain(0.14)
+      .decay(0.025)
+      .sustain(0)
+      .hpf(8000),
 
     // Crash accents on section changes
-    s(`
-      [oh ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ ~ ~ ~ ~]
+    note(`
+      [a7 ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ ~ ~ ~ ~]
       [~ ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ ~ ~ ~ ~]
-      [oh ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ ~ ~ ~ ~]
-      [~ ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ oh ~ ~ ~]
+      [a7 ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ ~ ~ ~ ~]
+      [~ ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ a7 ~ ~ ~]
     `)
-      .gain(0.25),
+      .s('square')
+      .gain(0.18)
+      .decay(0.15)
+      .sustain(0)
+      .hpf(5000),
 
     // =========================================================================
     // TEXTURE - Fast arpeggio for chiptune shimmer
@@ -309,42 +341,58 @@ export function heavyMetalTheme() {
       .sustain(0.6),
 
     // =========================================================================
-    // MACHINE GUN DRUMS - Blast beats and double kick fury
+    // MACHINE GUN DRUMS - Synthesized blast beats
     // =========================================================================
     
-    // Kick - constant double-kick assault
-    s(`
-      [bd bd bd bd bd bd bd bd]*8
+    // Kick - constant double-kick assault (sine wave)
+    note(`
+      [c1 c1 c1 c1 c1 c1 c1 c1]*8
     `)
-      .gain(0.42),
+      .s('sine')
+      .gain(0.50)
+      .decay(0.10)
+      .sustain(0),
 
-    // Snare - blast beat on every beat
-    s(`
-      [~ sd ~ sd ~ sd ~ sd]*4
-      [sd sd sd sd sd sd sd sd]*2
-      [~ sd ~ sd ~ sd ~ sd]*1
-      [sd sd sd sd sd sd sd sd]*1
+    // Snare - blast beat on every beat (square noise)
+    note(`
+      [~ c4 ~ c4 ~ c4 ~ c4]*4
+      [c4 c4 c4 c4 c4 c4 c4 c4]*2
+      [~ c4 ~ c4 ~ c4 ~ c4]*1
+      [c4 c4 c4 c4 c4 c4 c4 c4]*1
     `)
-      .gain(0.36),
+      .s('square')
+      .gain(0.32)
+      .decay(0.06)
+      .sustain(0)
+      .lpf(3000)
+      .hpf(200),
 
-    // Hi-hats - 32nd note fury
-    s(`
-      [hh hh hh hh hh hh oh hh hh hh hh hh hh hh oh hh]*4
-      [oh oh oh oh oh oh oh oh hh hh hh hh oh oh oh oh]*2
-      [hh hh hh hh hh hh oh hh]*2
+    // Hi-hats - 32nd note fury (high square)
+    note(`
+      [g7 g7 g7 g7 g7 g7 a7 g7 g7 g7 g7 g7 g7 g7 a7 g7]*4
+      [a7 a7 a7 a7 a7 a7 a7 a7 g7 g7 g7 g7 a7 a7 a7 a7]*2
+      [g7 g7 g7 g7 g7 g7 a7 g7]*2
     `)
-      .gain(0.26),
+      .s('square')
+      .gain(0.16)
+      .decay(0.02)
+      .sustain(0)
+      .hpf(9000),
 
-    // China/crash chaos
-    s(`
-      [oh ~ ~ ~ oh ~ ~ ~ oh ~ ~ ~ oh ~ ~ ~]*2
-      [oh ~ ~ ~ ~ ~ ~ ~ oh ~ ~ ~ ~ ~ ~ ~]*2
-      [oh ~ oh ~ oh ~ oh ~ oh ~ ~ ~ ~ ~ ~ ~]
-      [oh ~ ~ ~ oh ~ ~ ~ oh ~ ~ ~ oh ~ ~ oh]
-      [oh oh oh oh ~ ~ ~ ~ oh ~ ~ ~ ~ ~ ~ ~]
-      [oh ~ ~ ~ oh ~ ~ ~ oh ~ ~ ~ oh ~ ~ ~]
+    // China/crash chaos (high square burst)
+    note(`
+      [a7 ~ ~ ~ a7 ~ ~ ~ a7 ~ ~ ~ a7 ~ ~ ~]*2
+      [a7 ~ ~ ~ ~ ~ ~ ~ a7 ~ ~ ~ ~ ~ ~ ~]*2
+      [a7 ~ a7 ~ a7 ~ a7 ~ a7 ~ ~ ~ ~ ~ ~ ~]
+      [a7 ~ ~ ~ a7 ~ ~ ~ a7 ~ ~ ~ a7 ~ ~ a7]
+      [a7 a7 a7 a7 ~ ~ ~ ~ a7 ~ ~ ~ ~ ~ ~ ~]
+      [a7 ~ ~ ~ a7 ~ ~ ~ a7 ~ ~ ~ a7 ~ ~ ~]
     `)
-      .gain(0.20),
+      .s('square')
+      .gain(0.22)
+      .decay(0.18)
+      .sustain(0)
+      .hpf(4000),
 
     // =========================================================================
     // CHAOS ARPS - Frantic chiptune shimmer
