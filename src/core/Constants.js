@@ -72,13 +72,13 @@ export const ENEMIES = {
   },
   
   SLUDGE_CRAWLER: {
-    WIDTH: 28,            // 14x2 scale
-    HEIGHT: 20,           // 10x2 scale
+    WIDTH: 56,            // 14x4 scale (2x bigger to be shootable from ground)
+    HEIGHT: 40,           // 10x4 scale (2x bigger to be shootable from ground)
     SPEED: 0,             // Stationary (world scrolls past)
     HP: 5,                // Takes 5 hits to kill
     SCORE: 30,            // Higher score for tankier enemy
     COLOR: 0x228b22,      // Toxic green
-    SPAWN_WEIGHT: 10,     // Reduced to make room for Raider
+    SPAWN_WEIGHT: 5,      // Reduced spawn frequency (less common)
     TRAIL_INTERVAL: 800,  // ms between toxic puddle drops
     TRAIL_DAMAGE: 1,      // Damage from stepping in trail
     BACKWARD_SPEED: 0.7,  // Moves backwards at 70% of world scroll speed
@@ -238,8 +238,13 @@ export const POWERUPS = {
     COLOR: 0x888888,           // Steel gray
     ACCENT_COLOR: 0xff4400,    // Orange muzzle flash accent
     SPAWN_WEIGHT: 10,          // Rare powerful powerup
-    AMMO: 250,                 // 250 shots (bursts of 3 = ~83 bursts)
+    AMMO: 500,                 // 500 shots (bursts of 5 = 100 bursts)
     FIRE_RATE: 120,            // ms between auto-fire bursts (FAST)
+    // Quintuple shot angles (degrees)
+    ANGLE_SLIGHT_UP: -25,      // Slight upward angle
+    ANGLE_SLIGHT_DOWN: 25,     // Slight downward angle
+    ANGLE_STEEP_UP: -77,       // Almost vertical up (not quite 90°)
+    ANGLE_STEEP_DOWN: 77,      // Almost vertical down (not quite -90°)
   },
   
   EXTRA_HEART: {

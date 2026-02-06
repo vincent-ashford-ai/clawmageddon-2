@@ -9,6 +9,7 @@ import { eventBus, Events } from '../core/EventBus.js';
 import { gameState } from '../core/GameState.js';
 import { renderPixelArt } from '../core/PixelRenderer.js';
 import { HEART_FULL, HEART_HALF, HEART_EMPTY, HEART_PALETTE } from '../sprites/hearts.js';
+import { toggleMute } from '../audio/AudioBridge.js';
 
 export class UIScene extends Phaser.Scene {
   constructor() {
@@ -16,6 +17,7 @@ export class UIScene extends Phaser.Scene {
     this.hearts = [];
     this.displayScore = 0; // For smooth score animation
     this.targetScore = 0;
+    this.isMuted = false;
   }
 
   create() {
@@ -24,8 +26,36 @@ export class UIScene extends Phaser.Scene {
     renderPixelArt(this, HEART_HALF, HEART_PALETTE, 'heart-half', 2);
     renderPixelArt(this, HEART_EMPTY, HEART_PALETTE, 'heart-empty', 2);
 
-    // Score display (top right)
-    this.scoreText = this.add.text(GAME.WIDTH - UI.PADDING, UI.PADDING, 'SCORE: 0', {
+    // Mute button (top right corner)
+    this.muteButton = this.add.text(GAME.WIDTH - UI.PADDING, UI.PADDING, '🔊', {
+      fontSize: '28px',
+    }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
+    
+    this.muteButton.on('pointerdown', () => {
+      this.isMuted = toggleMute();
+      this.muteButton.setText(this.isMuted ? '🔇' : '🔊');
+      
+      // Visual feedback - quick scale pop
+      this.tweens.add({
+        targets: this.muteButton,
+        scaleX: 1.3,
+        scaleY: 1.3,
+        duration: 100,
+        yoyo: true,
+        ease: 'Quad.easeOut',
+      });
+    });
+    
+    // Hover effect
+    this.muteButton.on('pointerover', () => {
+      this.muteButton.setAlpha(0.7);
+    });
+    this.muteButton.on('pointerout', () => {
+      this.muteButton.setAlpha(1);
+    });
+
+    // Score display (top right, left of mute button)
+    this.scoreText = this.add.text(GAME.WIDTH - UI.PADDING - 40, UI.PADDING, 'SCORE: 0', {
       fontSize: UI.SCORE_FONT_SIZE,
       fontFamily: 'monospace',
       color: UI.SCORE_COLOR,

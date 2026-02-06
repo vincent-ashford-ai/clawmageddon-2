@@ -280,7 +280,7 @@ export class Lobster {
     eventBus.emit(Events.PROJECTILE_FIRED, {
       x: muzzleX,
       y: muzzleY,
-      triple: true, // Always triple shot
+      heavyMetal: true, // Quintuple shot (5 bullets)
     });
     
     // Extra muzzle flash for Heavy Metal (more particles)

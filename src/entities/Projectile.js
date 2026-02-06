@@ -5,7 +5,7 @@
 // =============================================================================
 
 import Phaser from 'phaser';
-import { PROJECTILE, ENEMY_PROJECTILE, GAME } from '../core/Constants.js';
+import { PROJECTILE, ENEMY_PROJECTILE, GAME, POWERUPS } from '../core/Constants.js';
 import { eventBus, Events } from '../core/EventBus.js';
 import { renderPixelArt } from '../core/PixelRenderer.js';
 import { PROJECTILE_SPRITES, PROJECTILE_PALETTE, ENEMY_BULLET } from '../sprites/projectiles.js';
@@ -97,8 +97,16 @@ export class ProjectilePool {
     eventBus.on(Events.PROJECTILE_FIRED, this.onFire);
   }
 
-  onFire({ x, y, triple }) {
-    if (triple) {
+  onFire({ x, y, triple, heavyMetal }) {
+    if (heavyMetal) {
+      // Heavy Metal quintuple shot: 5 bullets in a spread pattern
+      const hm = POWERUPS.HEAVY_METAL;
+      this.fireOne(x, y, 0);                    // Forward (horizontal)
+      this.fireOne(x, y, hm.ANGLE_SLIGHT_UP);   // Slight up
+      this.fireOne(x, y, hm.ANGLE_SLIGHT_DOWN); // Slight down
+      this.fireOne(x, y, hm.ANGLE_STEEP_UP);    // Almost vertical up
+      this.fireOne(x, y, hm.ANGLE_STEEP_DOWN);  // Almost vertical down
+    } else if (triple) {
       // Triple shot: up, straight, down
       this.fireOne(x, y, PROJECTILE.TRIPLE_ANGLE_UP);
       this.fireOne(x, y, 0);

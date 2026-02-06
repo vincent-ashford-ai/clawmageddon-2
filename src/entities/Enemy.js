@@ -265,8 +265,8 @@ export class SludgeCrawler extends Enemy {
     const spriteData = ENEMY_SPRITES.SLUDGE_CRAWLER;
     const texKey = 'enemy-sludgecrawler';
     
-    // Render the spritesheet (14x10 at scale 2 = 28x20)
-    renderSpriteSheet(scene, spriteData.frames, spriteData.palette, texKey, 2);
+    // Render the spritesheet (14x10 at scale 4 = 56x40) - 2x bigger to be shootable from ground
+    renderSpriteSheet(scene, spriteData.frames, spriteData.palette, texKey, 4);
     
     // Create animation - slow wobble
     if (!scene.anims.exists('sludgecrawler-wobble')) {
