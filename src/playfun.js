@@ -6,6 +6,7 @@
 import { eventBus, Events } from './core/EventBus.js';
 
 const GAME_ID = '1115ef0d-0af3-423c-a39b-106df9236221';
+const GAME_KEY = 'BnELEAf8VQezQHRKkiKyhAa6LsTdYBo7yjpRrbo2uCVG';
 
 let sdk = null;
 let initialized = false;
@@ -29,6 +30,7 @@ export async function initPlayFun() {
     
     sdk = new SDKClass({
       gameId: GAME_ID,
+      apiKey: GAME_KEY,
       ui: { usePointsWidget: true },
     });
 
