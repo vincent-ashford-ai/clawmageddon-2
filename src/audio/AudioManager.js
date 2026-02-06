@@ -15,17 +15,15 @@ class AudioManager {
 
   /**
    * Initialize Strudel audio engine.
-   * Must be called from a user interaction (click/tap) due to browser autoplay policy.
+   * Note: Strudel is now initialized directly in audioUnlock.js during the user gesture.
+   * This function just marks the manager as ready.
    */
   init() {
     if (this.initialized) return;
-    try {
-      initStrudel();
-      this.initialized = true;
-      console.log('[Audio] Strudel initialized');
-    } catch (e) {
-      console.warn('[Audio] Strudel init failed:', e);
-    }
+    // Strudel is already initialized by audioUnlock.js in the user gesture context
+    // We just need to mark ourselves as ready
+    this.initialized = true;
+    console.log('[Audio] AudioManager ready');
   }
 
   /**

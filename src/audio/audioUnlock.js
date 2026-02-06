@@ -4,6 +4,8 @@
 // Works on iOS Safari, Chrome, Firefox, and other mobile browsers.
 // =============================================================================
 
+import { initStrudel } from '@strudel/web';
+
 let unlocked = false;
 let unlockPromise = null;
 let unlockResolvers = [];
@@ -72,6 +74,15 @@ export async function unlockAudio(existingCtx = null) {
       setTimeout(() => {
         ctx.close().catch(() => {});
       }, 100);
+    }
+
+    // Initialize Strudel directly in the user gesture context
+    // This is REQUIRED for iOS Safari - can't do it in a promise callback
+    try {
+      initStrudel();
+      console.log('[AudioUnlock] Strudel initialized');
+    } catch (e) {
+      console.warn('[AudioUnlock] Strudel init failed:', e);
     }
 
     unlocked = true;
