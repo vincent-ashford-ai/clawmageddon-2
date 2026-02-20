@@ -321,6 +321,7 @@ export const PARALLAX = {
 
 // UI
 export const UI = {
+  TOP_OFFSET: 50, // Clear Play.fun overlay UI
   PADDING: 16,
   HEART_SIZE: 28,
   HEART_SPACING: 8,

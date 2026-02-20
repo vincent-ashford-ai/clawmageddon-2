@@ -26,8 +26,9 @@ export class UIScene extends Phaser.Scene {
     renderPixelArt(this, HEART_HALF, HEART_PALETTE, 'heart-half', 2);
     renderPixelArt(this, HEART_EMPTY, HEART_PALETTE, 'heart-empty', 2);
 
-    // Mute button (top right corner)
-    this.muteButton = this.add.text(GAME.WIDTH - UI.PADDING, UI.PADDING, '🔊', {
+    // Mute button (top right corner, below Play.fun overlay)
+    const topY = UI.PADDING + (UI.TOP_OFFSET || 0);
+    this.muteButton = this.add.text(GAME.WIDTH - UI.PADDING, topY, '🔊', {
       fontSize: '28px',
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
     
@@ -55,7 +56,7 @@ export class UIScene extends Phaser.Scene {
     });
 
     // Score display (top right, left of mute button)
-    this.scoreText = this.add.text(GAME.WIDTH - UI.PADDING - 40, UI.PADDING, 'SCORE: 0', {
+    this.scoreText = this.add.text(GAME.WIDTH - UI.PADDING - 40, topY, 'SCORE: 0', {
       fontSize: UI.SCORE_FONT_SIZE,
       fontFamily: 'monospace',
       color: UI.SCORE_COLOR,
@@ -113,7 +114,7 @@ export class UIScene extends Phaser.Scene {
     // Create heart sprites for max possible hearts
     for (let i = 0; i < PLAYER.MAX_HEARTS; i++) {
       const x = UI.PADDING + (UI.HEART_SIZE + UI.HEART_SPACING) * i + UI.HEART_SIZE / 2;
-      const y = UI.PADDING + UI.HEART_SIZE / 2;
+      const y = UI.PADDING + (UI.TOP_OFFSET || 0) + UI.HEART_SIZE / 2;
       
       // Create sprite starting with full heart texture
       const heart = this.add.image(x, y, 'heart-full');
