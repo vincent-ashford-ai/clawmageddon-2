@@ -52,8 +52,9 @@ export class MenuScene extends Phaser.Scene {
     // Generate and render the epic title screen art
     this.createEpicBackground();
     
-    // Title: CLAWMAGEDDON 2 - positioned in upper area
-    const title1 = this.add.text(cx, 60, 'CLAWMAGEDDON', {
+    // Title: CLAWMAGEDDON 2 - positioned below Play.fun overlay
+    const topOff = 50; // Play.fun UI offset
+    const title1 = this.add.text(cx, 60 + topOff, 'CLAWMAGEDDON', {
       fontSize: '38px',
       fontFamily: 'Impact, monospace',
       color: '#ff4444',
@@ -61,7 +62,7 @@ export class MenuScene extends Phaser.Scene {
       strokeThickness: 8,
     }).setOrigin(0.5);
     
-    const title2 = this.add.text(cx, 110, '2', {
+    const title2 = this.add.text(cx, 110 + topOff, '2', {
       fontSize: '72px',
       fontFamily: 'Impact, monospace',
       color: '#ffaa00',
@@ -91,7 +92,7 @@ export class MenuScene extends Phaser.Scene {
     });
     
     // Add glow effect behind title
-    const titleGlow = this.add.text(cx, 60, 'CLAWMAGEDDON', {
+    const titleGlow = this.add.text(cx, 60 + topOff, 'CLAWMAGEDDON', {
       fontSize: '38px',
       fontFamily: 'Impact, monospace',
       color: '#ff0000',
@@ -106,7 +107,7 @@ export class MenuScene extends Phaser.Scene {
     });
 
     // Subtitle
-    this.add.text(cx, 155, 'THE LOBSTER RISES', {
+    this.add.text(cx, 155 + topOff, 'THE LOBSTER RISES', {
       fontSize: '14px',
       fontFamily: 'monospace',
       color: '#888888',
