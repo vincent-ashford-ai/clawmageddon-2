@@ -106,8 +106,8 @@ class GameState {
     if (this.maxHearts >= PLAYER.MAX_HEARTS) return false;
     
     this.maxHearts++;
-    // Fill health to full (not just +1 heart)
-    this.currentHearts = this.maxHearts;
+    // Add one full heart (don't fill all hearts to max)
+    this.currentHearts++;
     this.currentHits = PLAYER.HITS_PER_HEART;
     
     eventBus.emit(Events.EXTRA_HEART_GAINED);
