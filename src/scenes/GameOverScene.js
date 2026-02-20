@@ -22,7 +22,7 @@ export class GameOverScene extends Phaser.Scene {
     const cy = GAME.HEIGHT / 2;
 
     // Mute button (top right corner) - consistent across all screens
-    this.muteButton = this.add.text(GAME.WIDTH - UI.PADDING, UI.PADDING, '🔊', {
+    this.muteButton = this.add.text(GAME.WIDTH - UI.PADDING, UI.PADDING + 50, '🔊', {
       fontSize: '28px',
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true }).setDepth(100);
     
@@ -53,7 +53,7 @@ export class GameOverScene extends Phaser.Scene {
     this.createDramaticBackground();
 
     // GAME OVER title - dramatic entrance
-    const gameOverText = this.add.text(cx, 80, 'GAME OVER', {
+    const gameOverText = this.add.text(cx, 130, 'GAME OVER', {
       fontSize: '48px',
       fontFamily: 'Impact, monospace',
       color: '#ff0000',
@@ -90,7 +90,7 @@ export class GameOverScene extends Phaser.Scene {
     });
 
     // Add red glow behind title
-    const glowText = this.add.text(cx, 80, 'GAME OVER', {
+    const glowText = this.add.text(cx, 130, 'GAME OVER', {
       fontSize: '48px',
       fontFamily: 'Impact, monospace',
       color: '#880000',

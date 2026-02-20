@@ -21,8 +21,8 @@ export class MenuScene extends Phaser.Scene {
     const cx = GAME.WIDTH / 2;
     const cy = GAME.HEIGHT / 2;
 
-    // Mute button (top right corner) - consistent across all screens
-    this.muteButton = this.add.text(GAME.WIDTH - UI.PADDING, UI.PADDING, '🔊', {
+    // Mute button (top right corner, below Play.fun overlay)
+    this.muteButton = this.add.text(GAME.WIDTH - UI.PADDING, UI.PADDING + 50, '🔊', {
       fontSize: '28px',
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true }).setDepth(100);
     
