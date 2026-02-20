@@ -114,7 +114,7 @@ export class UIScene extends Phaser.Scene {
     // Create heart sprites for max possible hearts
     for (let i = 0; i < PLAYER.MAX_HEARTS; i++) {
       const x = UI.PADDING + (UI.HEART_SIZE + UI.HEART_SPACING) * i + UI.HEART_SIZE / 2;
-      const y = UI.PADDING + (UI.TOP_OFFSET || 0) + UI.HEART_SIZE / 2;
+      const y = UI.PADDING + (UI.TOP_OFFSET || 0) + UI.HEART_SIZE;
       
       // Create sprite starting with full heart texture
       const heart = this.add.image(x, y, 'heart-full');
